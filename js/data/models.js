@@ -24,7 +24,7 @@ const models3dData = [
         id: 'gpu',
         name: 'Видеокарта (GPU)',
         icon: '🎮',
-        src: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/BoomBox/glTF-Binary/BoomBox.glb',
+        src: 'assets/models/gpu.glb',
         description: 'Графический процессор отвечает за вывод изображения и 3D-расчёты. Устанавливается в слот PCI-Express x16 на материнской плате.',
         specs: [
             'Интерфейс: PCI-Express 4.0 x16',
@@ -37,7 +37,7 @@ const models3dData = [
         id: 'motherboard',
         name: 'Материнская плата',
         icon: '🔧',
-        src: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb',
+        src: 'assets/models/motherboard.glb',
         description: 'Основа системного блока. Объединяет все компоненты — процессор, память, видеокарту, накопители — и обеспечивает их взаимодействие.',
         specs: [
             'Форм-фактор: ATX',
@@ -51,7 +51,7 @@ const models3dData = [
         id: 'ram',
         name: 'Оперативная память',
         icon: '💾',
-        src: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Lantern/glTF-Binary/Lantern.glb',
+        src: 'assets/models/ram.glb',
         description: 'Планка оперативной памяти — быстрое временное хранилище данных. Устанавливается в слоты DIMM на материнской плате.',
         specs: [
             'Тип: DDR5',
@@ -64,7 +64,7 @@ const models3dData = [
         id: 'storage',
         name: 'NVMe SSD',
         icon: '💿',
-        src: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/WaterBottle/glTF-Binary/WaterBottle.glb',
+        src: 'assets/models/ssd.glb',
         description: 'Твердотельный накопитель в формате M.2. Подключается напрямую в слот M.2 на материнской плате через шину PCI-Express.',
         specs: [
             'Форм-фактор: M.2 2280',
@@ -77,7 +77,7 @@ const models3dData = [
         id: 'psu',
         name: 'Блок питания',
         icon: '🔌',
-        src: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/MetalRoughSpheres/glTF-Binary/MetalRoughSpheres.glb',
+        src: 'assets/models/psu.glb',
         description: 'Преобразует переменный ток из розетки в постоянный для питания компонентов. От качества БП зависит стабильность всей системы.',
         specs: [
             'Мощность: 650–850 Вт',

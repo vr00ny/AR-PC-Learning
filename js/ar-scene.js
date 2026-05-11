@@ -42,7 +42,7 @@ function createARScene() {
     // Модель материнской платы (временно — DamagedHelmet из Khronos)
     const modelMb = document.createElement('a-entity');
     modelMb.setAttribute('id', 'arMb');
-    modelMb.setAttribute('gltf-model', 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf');
+    modelMb.setAttribute('gltf-model', 'assets/models/motherboard.glb');
     modelMb.setAttribute('scale', '0.5 0.5 0.5');
     modelMb.setAttribute('visible', 'true');
 
