@@ -49,7 +49,7 @@ function createARScene() {
     // Модель процессора (временно — MetalRoughSpheres)
     const modelCpu = document.createElement('a-entity');
     modelCpu.setAttribute('id', 'arCpu');
-    modelCpu.setAttribute('gltf-model', 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/MetalRoughSpheres/glTF/MetalRoughSpheres.gltf');
+    modelCpu.setAttribute('gltf-model', 'assets/models/cpu.glb');
     modelCpu.setAttribute('scale', '0.4 0.4 0.4');
     modelCpu.setAttribute('position', '0 0.3 0');
     modelCpu.setAttribute('visible', 'false');

@@ -11,7 +11,7 @@ const models3dData = [
         id: 'cpu',
         name: 'Процессор (CPU)',
         icon: '⚙️',
-        src: 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Avocado/glTF-Binary/Avocado.glb',
+        src: 'assets/models/cpu.glb',
         description: 'Центральный процессор — основное вычислительное устройство. На нижней стороне расположены контакты для установки в сокет материнской платы.',
         specs: [
             'Сокет: LGA1700',
