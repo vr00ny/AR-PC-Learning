@@ -1,0 +1,17 @@
+# Системные файлы Windows и Mac
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Настройки редакторов
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Логи
+*.log
+
+# Временные файлы
+~$*
+*.tmp

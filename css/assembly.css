@@ -1,0 +1,251 @@
+/* ===== ИГРА СБОРКИ (тёмная тема) ===== */
+.assembly-intro {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--ink-dim);
+    line-height: 1.6;
+}
+.assembly-intro::before {
+    content: "// MISSION";
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 0.12em;
+    display: block;
+    margin-bottom: 8px;
+}
+
+/* Панель статистики (в стиле .hero-meta) */
+.assembly-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(15,20,29,0.4);
+}
+.stat-card {
+    padding: 14px 18px;
+    border-right: 1px solid var(--line);
+    text-align: left;
+}
+.stat-card:last-child { border-right: 0; }
+.stat-label {
+    font-family: "JetBrains Mono";
+    font-size: 10px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+}
+.stat-value {
+    font-family: "Space Grotesk";
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--teal);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+/* Материнская плата */
+.assembly-board {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    margin-top: 16px;
+    background:
+        repeating-linear-gradient(0deg, rgba(79,209,197,0.04) 0, rgba(79,209,197,0.04) 1px, transparent 1px, transparent 20px),
+        repeating-linear-gradient(90deg, rgba(79,209,197,0.04) 0, rgba(79,209,197,0.04) 1px, transparent 1px, transparent 20px),
+        linear-gradient(135deg, #0d2627 0%, #062814 100%);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 60px rgba(79,209,197,0.06);
+    border: 1px solid rgba(79,209,197,0.20);
+}
+
+.assembly-slot {
+    position: absolute;
+    border: 2px dashed rgba(79,209,197,0.3);
+    border-radius: 6px;
+    background: rgba(11,15,23,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "JetBrains Mono";
+    font-size: 10px;
+    font-weight: 500;
+    color: rgba(230,236,245,0.55);
+    text-align: center;
+    padding: 2px;
+    transition: border-color .15s, background .15s, color .15s;
+    user-select: none;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+.assembly-slot.highlight {
+    border-color: var(--amber);
+    border-style: solid;
+    background: rgba(232,182,90,0.15);
+    color: var(--amber);
+    box-shadow: 0 0 16px rgba(232,182,90,0.4);
+}
+.assembly-slot.filled {
+    border-color: var(--green);
+    border-style: solid;
+    background: rgba(124,217,146,0.18);
+    color: var(--green);
+    font-size: 1.3rem;
+    box-shadow: 0 0 12px rgba(124,217,146,0.25);
+}
+
+/* Лоток */
+.assembly-tray-title {
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 22px 0 10px;
+}
+.assembly-tray-title::before { content: "// "; color: var(--teal); }
+
+.assembly-tray {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 10px;
+    padding: 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    min-height: 110px;
+}
+
+.tray-item {
+    background: var(--bg-2);
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    padding: 14px 8px;
+    text-align: center;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+    transition: transform .15s, border-color .15s, background .15s;
+}
+.tray-item:hover {
+    transform: translateY(-2px);
+    border-color: rgba(79,209,197,0.4);
+    background: var(--bg-3);
+}
+.tray-item:active { cursor: grabbing; }
+.tray-item.dragging {
+    position: fixed;
+    z-index: 1000;
+    pointer-events: none;
+    cursor: grabbing;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.6), 0 0 0 1px var(--teal);
+    transform: scale(1.05);
+    background: var(--bg-3);
+    border-color: var(--teal);
+}
+.tray-item.placed { display: none; }
+
+.tray-item-icon { font-size: 1.7rem; line-height: 1; color: var(--teal); }
+.tray-item-name {
+    font-family: "JetBrains Mono";
+    font-size: 10.5px;
+    font-weight: 500;
+    color: var(--ink-dim);
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-8px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
+}
+.tray-item.shake { animation: shake 0.4s; border-color: var(--red); }
+
+/* Победа */
+.assembly-win {
+    display: none;
+    margin-top: 16px;
+    padding: 28px 22px;
+    background:
+        radial-gradient(circle at 80% 20%, rgba(79,209,197,0.12), transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(91,142,247,0.10), transparent 50%),
+        var(--panel);
+    border: 1px solid rgba(79,209,197,0.3);
+    color: var(--ink);
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 0 60px rgba(79,209,197,0.15);
+}
+.assembly-win.show { display: block; }
+.assembly-win-title {
+    font-family: "Space Grotesk";
+    font-weight: 600;
+    font-size: 28px;
+    letter-spacing: -0.025em;
+    color: var(--teal);
+    margin-bottom: 10px;
+}
+.assembly-win-stats {
+    font-family: "JetBrains Mono";
+    font-size: 13px;
+    color: var(--ink-dim);
+    line-height: 1.8;
+    margin: 14px 0;
+}
+.assembly-win-stats b { color: var(--ink); font-weight: 600; }
+.assembly-win button {
+    margin-top: 14px;
+    padding: 12px 22px;
+    background: var(--teal);
+    color: #072120;
+    border: 0;
+    border-radius: 25px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 13.5px;
+    cursor: pointer;
+    box-shadow: 0 0 0 1px rgba(79,209,197,0.5), 0 8px 20px rgba(79,209,197,0.22);
+    transition: transform .15s;
+}
+.assembly-win button:hover { transform: translateY(-2px); }
+
+.assembly-restart {
+    display: block;
+    margin: 14px auto 0;
+    padding: 10px 22px;
+    background: var(--bg-2);
+    color: var(--ink);
+    border: 1px solid var(--line-2);
+    border-radius: 25px;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, color .2s;
+}
+.assembly-restart:hover {
+    background: var(--bg-3);
+    border-color: rgba(79,209,197,0.3);
+    color: var(--teal);
+}
+
+@media (max-width: 720px) {
+    .assembly-stats { grid-template-columns: 1fr 1fr; }
+    .stat-card { border-right: 0; border-bottom: 1px solid var(--line); }
+    .stat-card:nth-child(2) { border-right: 0; }
+    .stat-card:nth-last-child(-n+1) { border-bottom: 0; }
+    .stat-value { font-size: 18px; }
+}

@@ -1,0 +1,171 @@
+/* ===== 3D-ПРОСМОТРЩИК (тёмная PCB-рамка) ===== */
+.viewer-stage {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-top: 8px;
+    position: relative;
+}
+.viewer-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(79,209,197,0.18) 1px, transparent 1px) 50% 50% / 100% 40px,
+        linear-gradient(90deg, rgba(79,209,197,0.18) 1px, transparent 1px) 50% 50% / 40px 100%;
+    mask: radial-gradient(circle at center, #000 0%, #000 30%, transparent 78%);
+    -webkit-mask: radial-gradient(circle at center, #000 0%, #000 30%, transparent 78%);
+    opacity: .35;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.viewer-stage model-viewer {
+    width: 100%;
+    height: 55vh;
+    min-height: 380px;
+    background: linear-gradient(160deg,#0a1419,#0d1a1d);
+    --poster-color: transparent;
+    --progress-bar-color: var(--teal);
+    position: relative;
+    z-index: 2;
+}
+
+/* Уголки PCB-рамки */
+.viewer-stage::after {
+    content: "TRACKING · LIVE";
+    position: absolute;
+    top: 14px; left: 14px;
+    font-family: "JetBrains Mono";
+    font-size: 10px;
+    color: var(--teal);
+    background: rgba(79,209,197,0.08);
+    padding: 4px 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(79,209,197,0.25);
+    letter-spacing: 0.1em;
+    z-index: 3;
+}
+
+.viewer-controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    background: var(--bg-2);
+    border-top: 1px solid var(--line);
+    position: relative;
+    z-index: 3;
+}
+.viewer-btn {
+    padding: 8px 14px;
+    background: var(--bg-3);
+    color: var(--ink);
+    border: 1px solid var(--line-2);
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .2s, border-color .2s, color .2s;
+}
+.viewer-btn:hover { background: var(--bg-2); border-color: rgba(79,209,197,0.3); color: var(--teal); }
+.viewer-btn.active {
+    background: var(--teal);
+    color: #072120;
+    border-color: var(--teal);
+    box-shadow: 0 0 0 1px rgba(79,209,197,0.5), 0 6px 16px rgba(79,209,197,0.18);
+}
+
+/* Информационная панель */
+.viewer-info {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-top: 16px;
+}
+.viewer-info h3 {
+    font-family: "Space Grotesk";
+    font-weight: 600;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin: 0 0 6px;
+}
+.viewer-info p {
+    color: var(--ink-dim);
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin: 0 0 14px;
+}
+.viewer-info strong {
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+    color: var(--teal);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+}
+.viewer-info ul { margin: 0; padding: 0; list-style: none; }
+.viewer-info li {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 6px;
+    color: var(--ink);
+    font-size: 13.5px;
+}
+.viewer-info li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+}
+
+/* Миниатюры выбора модели */
+.viewer-thumbs-title {
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 22px 0 10px;
+}
+.viewer-thumbs-title::before { content: "// "; color: var(--teal); }
+
+.model-thumbs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+}
+.model-thumb {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: transform .15s, border-color .15s, background .15s;
+}
+.model-thumb:hover {
+    transform: translateY(-2px);
+    border-color: rgba(79,209,197,0.3);
+    background: var(--bg-2);
+}
+.model-thumb.active {
+    border-color: var(--teal);
+    background: rgba(79,209,197,0.06);
+    box-shadow: 0 0 0 1px rgba(79,209,197,0.3);
+}
+.model-thumb-icon { font-size: 1.6rem; line-height: 1; }
+.model-thumb-name {
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-dim);
+    margin-top: 8px;
+    letter-spacing: 0.04em;
+}
+.model-thumb.active .model-thumb-name { color: var(--ink); }
