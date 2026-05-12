@@ -113,7 +113,7 @@
         <div class="reveal">
             <div class="hero-eyebrow">
                 <span class="pulse"></span>
-                AR · WebGL · v2026.05 · build MV-AR (Scene Viewer)
+                AR · WebGL · v2026.05 · build iOS-MARKER
             </div>
             <h1>
                 Открой системный блок,<br>
@@ -426,15 +426,15 @@
     </section>
 </div>
 
-<!-- ===== AR-ТРЕНАЖЁР (markerless через model-viewer / Scene Viewer) ===== -->
+<!-- ===== AR-ТРЕНАЖЁР ===== -->
 <div id="ar" class="tab-content">
     <section class="section">
         <div class="sec-head reveal">
             <div>
-                <div class="sec-tag">AR Lab · Markerless</div>
-                <h2>Размести компонент ПК в своей комнате.</h2>
+                <div class="sec-tag">AR Lab</div>
+                <h2>Тренажёр в дополненной реальности.</h2>
             </div>
-            <p>Без маркеров и без приложений. Нажми «Открыть в AR» — компонент появится у тебя на столе или на полу. Можно подойти ближе, обойти со всех сторон.</p>
+            <p>Поверни компонент в 3D или открой режим AR с маркером Hiro — над ним появится 3D-модель прямо в камере телефона.</p>
         </div>
 
         <div class="ar-stage">
@@ -444,22 +444,8 @@
                 touch-action="pan-y"
                 shadow-intensity="1.2"
                 exposure="1.1"
-                ar
-                ar-modes="webxr scene-viewer quick-look"
-                ar-scale="auto"
-                ar-placement="floor"
                 bounds="tight"
                 alt="3D-модель компонента ПК">
-                <button slot="ar-button" class="ar-launch-btn">
-                    <span class="ar-launch-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 7l9 5 9-5"/>
-                            <path d="M3 7v10l9 5 9-5V7"/>
-                            <path d="M12 12v10"/>
-                        </svg>
-                    </span>
-                    Открыть в AR
-                </button>
             </model-viewer>
         </div>
 
@@ -468,18 +454,35 @@
             <p id="arCurrentDesc"></p>
         </div>
 
+        <div class="ar-launch-row">
+            <button class="ar-launch-btn" id="arLaunchBtn" onclick="openMarkerAR()">
+                <span class="ar-launch-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7 8h10a4 4 0 0 1 4 4v0a4 4 0 0 1-4 4h-1l-2-3H10l-2 3H7a4 4 0 0 1-4-4v0a4 4 0 0 1 4-4z"/>
+                        <circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/>
+                    </svg>
+                </span>
+                🎥 Открыть AR с маркером
+            </button>
+            <a class="ar-marker-download" href="assets/markers/hiro.png" download="hiro.png">
+                📥 Скачать маркер Hiro
+            </a>
+        </div>
+
         <div class="ar-thumbs-title">Выбери компонент</div>
         <div class="ar-thumbs" id="arThumbs"></div>
 
         <div class="ar-instructions">
-            <strong>Как открыть в AR</strong>
+            <strong>Как запустить AR</strong>
             <ol>
-                <li>На <b>Android</b> нажми «Открыть в AR» — запустится Google Scene Viewer, камера сама найдёт пол/стол</li>
-                <li>На <b>iPhone</b> компонент откроется в полноэкранном 3D-просмотре (для настоящего AR на iOS нужны .usdz-файлы)</li>
-                <li>Прозрачное окно вокруг детали — это превью, его можно крутить пальцем</li>
+                <li>Скачай и распечатай <b>маркер Hiro</b> (или открой картинку на втором экране — компе, планшете)</li>
+                <li>Нажми <b>«Открыть AR с маркером»</b> и разреши камере доступ</li>
+                <li>Наведи камеру телефона на маркер — над ним появится модель компонента</li>
+                <li>Внутри AR можно переключать модели кнопками внизу</li>
+                <li>Кнопка <b>✕</b> в углу — выйти из AR</li>
             </ol>
             <p style="margin-top:12px;color:var(--ink-mute);font-size:13px">
-                💡 Размещение работает в Chrome / Edge / Samsung Internet на Android 8+ с поддержкой ARCore.
+                💡 Совет: для лучшего трекинга маркер должен быть минимум <b>5×5 см</b>, освещение ровное, фон контрастный.
             </p>
         </div>
     </section>

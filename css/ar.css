@@ -37,21 +37,26 @@
     --progress-bar-color: var(--teal);
 }
 
-/* Кнопка "Открыть в AR" — slot model-viewer */
+/* Строка кнопок запуска AR */
+.ar-launch-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
 .ar-launch-btn {
-    position: absolute;
-    bottom: 16px; right: 16px;
-    z-index: 10;
+    flex: 1 1 220px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 22px;
     border: 0;
     border-radius: 30px;
     background: var(--teal);
     color: #072120;
     font-family: inherit;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.02em;
     cursor: pointer;
@@ -61,7 +66,30 @@
 .ar-launch-btn:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(79,209,197,0.6), 0 14px 30px rgba(79,209,197,0.45); }
 .ar-launch-btn:active { transform: translateY(0); }
 .ar-launch-icon { display: inline-flex; }
-.ar-launch-icon svg { width: 18px; height: 18px; }
+.ar-launch-icon svg { width: 20px; height: 20px; }
+
+.ar-marker-download {
+    flex: 1 1 200px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 22px;
+    border-radius: 30px;
+    border: 1px solid var(--line-2);
+    background: var(--bg-2);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .2s, color .2s, border-color .2s;
+}
+.ar-marker-download:hover {
+    background: var(--bg-3);
+    color: var(--teal);
+    border-color: rgba(79,209,197,0.5);
+}
 
 /* Карточка с описанием текущего компонента */
 .ar-current {
