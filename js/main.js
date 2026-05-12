@@ -11,10 +11,6 @@ function openTabByName(tabName) {
     const link = document.querySelector(`.tab-link[data-tab="${tabName}"]`);
     if (link) link.classList.add('active');
 
-    // Закрываем AR-камеру при уходе с вкладки AR
-    if (tabName !== 'ar' && typeof destroyARScene === 'function') destroyARScene();
-    // Закрываем AR-фон сборки при уходе с вкладки Сборка
-    if (tabName !== 'assembly' && typeof destroyAssemblyAR === 'function') destroyAssemblyAR();
 
     // Закрываем мобильное меню
     const topbar = document.querySelector('.topbar');
@@ -89,30 +85,6 @@ loadQuiz();
 loadTheory();
 loadViewer3d();
 loadAssemblyGame();
+if (typeof loadAR === 'function') loadAR();
 observeReveals();
 
-// AR-кнопки (привязка только если есть в DOM)
-const startBtn = document.getElementById('startCameraBtn');
-const stopBtn = document.getElementById('stopCameraBtn');
-if (startBtn) startBtn.onclick = () => { createARScene(); };
-if (stopBtn) stopBtn.onclick = () => { destroyARScene(); };
-
-// Полноэкранный показ маркера Hiro — удобно открыть на компе, навести камеру с телефона
-function openMarkerFullscreen() {
-    const overlay = document.getElementById('markerOverlay');
-    if (!overlay) return;
-    overlay.classList.add('show');
-    // Запросить полный экран браузера, если поддерживается (даёт максимум места под маркер)
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen;
-    if (req) { try { req.call(el); } catch (e) {} }
-}
-function closeMarkerFullscreen() {
-    const overlay = document.getElementById('markerOverlay');
-    if (!overlay) return;
-    overlay.classList.remove('show');
-    if (document.fullscreenElement || document.webkitFullscreenElement) {
-        const exit = document.exitFullscreen || document.webkitExitFullscreen;
-        if (exit) { try { exit.call(document); } catch (e) {} }
-    }
-}

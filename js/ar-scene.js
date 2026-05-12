@@ -1,61 +1,40 @@
-// AR через iframe. AR.js работает в собственном документе (ar.html) и физически
-// не может изменить viewport или стили родительской страницы. При выходе iframe
-// удаляется — сайт остаётся в точности таким, каким был до запуска AR.
+// AR-вкладка через <model-viewer> (markerless AR на Android).
+// На Android нажатие "Открыть в AR" запускает нативный Google Scene Viewer,
+// он находит плоскость пола/стола и размещает компонент в реальной комнате.
+// На iPhone Safari без .usdz это просто красивый 3D-просмотр.
 
-let isCameraOn = false;
-let arMessageListener = null;
+function loadAR() {
+    const viewer = document.getElementById('arViewer');
+    const thumbs = document.getElementById('arThumbs');
+    const nameEl = document.getElementById('arCurrentName');
+    const descEl = document.getElementById('arCurrentDesc');
+    if (!viewer || !thumbs || !window.models3dData) return;
 
-function destroyARScene() {
-    const iframe = document.getElementById('arIframe');
-    if (iframe) {
-        // Дать iframe шанс остановить камеру через beforeunload
-        iframe.remove();
+    function setModel(m) {
+        viewer.src = m.src;
+        viewer.setAttribute('alt', m.name);
+        viewer.setAttribute('poster', '');
+        nameEl.textContent = m.name;
+        descEl.textContent = m.description;
+        thumbs.querySelectorAll('.ar-thumb').forEach(t => {
+            t.classList.toggle('active', t.dataset.id === m.id);
+        });
     }
-    if (arMessageListener) {
-        window.removeEventListener('message', arMessageListener);
-        arMessageListener = null;
-    }
-    isCameraOn = false;
-}
 
-function createARScene() {
-    if (isCameraOn) return;
-    destroyARScene();
-
-    const iframe = document.createElement('iframe');
-    iframe.id = 'arIframe';
-    iframe.src = 'ar.html?ts=' + Date.now();
-    iframe.allow = 'camera; microphone; xr-spatial-tracking; gyroscope; accelerometer';
-    iframe.setAttribute('allowfullscreen', '');
-    iframe.style.cssText =
-        'position:fixed;top:0;left:0;width:100vw;height:100vh;' +
-        'border:0;margin:0;padding:0;background:#000;z-index:10000;';
-    document.body.appendChild(iframe);
-
-    arMessageListener = (e) => {
-        if (e.data && e.data.type === 'ar-close') destroyARScene();
-    };
-    window.addEventListener('message', arMessageListener);
-
-    isCameraOn = true;
-}
-
-// stopAllCameraStreams / forceBackCamera / restoreGetUserMedia / snapshotPageLayout /
-// restorePageLayout — больше не нужны для AR-вкладки, но assembly-ar.js на них ссылается,
-// поэтому оставляем заглушки (для assembly-ar.js пока используется старый подход).
-
-function stopAllCameraStreams() {
-    document.querySelectorAll('video').forEach(v => {
-        const s = v.srcObject;
-        if (s && s.getTracks) s.getTracks().forEach(t => { try { t.stop(); } catch (e) {} });
-        v.srcObject = null;
+    thumbs.innerHTML = '';
+    models3dData.forEach((m, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'ar-thumb' + (i === 0 ? ' active' : '');
+        btn.dataset.id = m.id;
+        btn.innerHTML =
+            '<div class="ar-thumb-icon">' + m.icon + '</div>' +
+            '<div class="ar-thumb-name">' + m.name + '</div>';
+        btn.onclick = () => setModel(m);
+        thumbs.appendChild(btn);
     });
+    setModel(models3dData[0]);
 }
-function forceBackCamera() { /* no-op — теперь в ar.html */ }
-function restoreGetUserMedia() { /* no-op */ }
-function snapshotPageLayout() { /* no-op */ }
-function restorePageLayout() { /* no-op */ }
 
-window.addEventListener('beforeunload', () => {
-    if (isCameraOn) stopAllCameraStreams();
-});
+// Удалить старые функции — теперь не нужны
+function createARScene() { /* legacy noop */ }
+function destroyARScene() { /* legacy noop */ }

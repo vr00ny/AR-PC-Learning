@@ -1,16 +1,23 @@
-/* ===== AR-ТРЕНАЖЁР (тёмная тема + PCB рамка) ===== */
-.ar-wrapper {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 14px;
-    overflow: hidden;
-    margin-top: 8px;
+/* ===== AR-ТРЕНАЖЁР · markerless через model-viewer ===== */
+
+.ar-stage {
     position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 11;
+    margin-top: 14px;
+    background:
+        repeating-linear-gradient(0deg, rgba(79,209,197,0.04) 0, rgba(79,209,197,0.04) 1px, transparent 1px, transparent 24px),
+        repeating-linear-gradient(90deg, rgba(79,209,197,0.04) 0, rgba(79,209,197,0.04) 1px, transparent 1px, transparent 24px),
+        linear-gradient(135deg, #0c1117 0%, #0a1820 100%);
+    border-radius: 16px;
+    border: 1px solid rgba(79,209,197,0.20);
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 60px rgba(79,209,197,0.06);
 }
-.ar-wrapper::before {
-    content: "AR.CORE · v2.4";
+.ar-stage::before {
+    content: "AR.CORE · v2.4 · markerless";
     position: absolute;
-    top: 14px; right: 14px;
+    top: 14px; left: 14px;
     font-family: "JetBrains Mono";
     font-size: 10px;
     color: var(--teal);
@@ -19,323 +26,115 @@
     border-radius: 5px;
     border: 1px solid rgba(79,209,197,0.25);
     letter-spacing: 0.1em;
-    z-index: 40;
-}
-
-.ar-container {
-    width: 100%;
-    height: 50vh;
-    min-height: 360px;
-    position: relative;
-    background: linear-gradient(160deg, #050a10, #0a141b);
-    overflow: hidden;
-}
-
-.ar-container a-scene {
-    width: 100% !important;
-    height: 100% !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    transform: none !important;
-}
-a-scene:not(.ar-container a-scene) { display: none !important; }
-
-/* Видео AR.js внутри контейнера — занимает всю рамку */
-.ar-container video,
-.ar-container #arjs-video,
-.assembly-ar-layer video,
-.assembly-ar-layer #arjs-video {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    transform: none !important;
-    z-index: 1 !important;
-    display: block !important;
-}
-
-/* Пока видео ещё не переехало в контейнер — даём ему минимальный размер,
-   чтобы AR.js не растягивал его на весь экран и не ломал вёрстку.
-   В контейнере приведённое выше правило вернёт ему 100%. */
-body > video#arjs-video {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 1px !important;
-    height: 1px !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    z-index: -1 !important;
-}
-/* Аналогично для канвасов A-Frame, если они оторвутся в body */
-body > canvas.a-canvas {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 1px !important;
-    height: 1px !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    z-index: -1 !important;
-}
-
-/* Когда AR активен — перебиваем любые inline-стили, которые AR.js пытается навесить
-   на html/body (margin, padding, overflow и т.п.), чтобы вёрстка не съезжала.
-   Эти !important побеждают inline-style без !important, которые ставит AR.js. */
-html.ar-active,
-body.ar-active {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-html.ar-active { overflow: auto !important; }
-body.ar-active {
-    overflow-x: hidden !important;
-    min-height: 100vh !important;
-    position: static !important;
-}
-
-/* ===== Fullscreen-режим AR-вкладки ===== */
-/* iOS Safari всё равно стремится развернуть камеру на весь viewport,
-   поэтому встраивать в маленькую рамку ненадёжно. Делаем нормальный AR-UX:
-   при включении камеры сайт прячется, AR на весь экран, кнопка выхода в углу. */
-body.ar-fullscreen { overflow: hidden !important; }
-body.ar-fullscreen > .topbar,
-body.ar-fullscreen > footer,
-body.ar-fullscreen #home,
-body.ar-fullscreen #components,
-body.ar-fullscreen #theory,
-body.ar-fullscreen #viewer3d,
-body.ar-fullscreen #assembly,
-body.ar-fullscreen #quiz,
-body.ar-fullscreen #about { display: none !important; }
-body.ar-fullscreen #ar .sec-head,
-body.ar-fullscreen #ar .ar-instructions,
-body.ar-fullscreen #ar .camera-buttons { display: none !important; }
-body.ar-fullscreen #ar > .section { padding: 0 !important; margin: 0 !important; max-width: none !important; }
-body.ar-fullscreen .ar-wrapper {
-    position: fixed !important;
-    inset: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    border: 0 !important;
-    z-index: 10000 !important;
-    background: #000 !important;
-}
-body.ar-fullscreen .ar-wrapper::before { display: none !important; }
-body.ar-fullscreen .ar-container {
-    height: 100% !important;
-    min-height: 0 !important;
-    border-radius: 0 !important;
-}
-
-/* Кнопка выхода из AR */
-.ar-exit-btn {
-    position: fixed;
-    top: calc(env(safe-area-inset-top, 0px) + 14px);
-    right: calc(env(safe-area-inset-right, 0px) + 14px);
-    z-index: 10100;
-    width: 46px; height: 46px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.25);
-    background: rgba(11,15,23,0.75);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #fff;
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-}
-.ar-exit-btn:active { transform: scale(0.94); }
-
-/* ===== Кнопки действий с маркером ===== */
-.marker-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-}
-.marker-action-btn {
-    flex: 1 1 200px;
-    padding: 12px 16px;
-    border-radius: 10px;
-    border: 1px solid var(--line-2);
-    background: var(--bg-2);
-    color: var(--ink);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    text-decoration: none;
-    transition: background .2s, border-color .2s, color .2s;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-.marker-action-btn:hover {
-    background: var(--bg-3);
-    border-color: var(--teal);
-    color: var(--teal);
-}
-.marker-action-btn.ghost {
-    background: transparent;
-}
-
-/* ===== Полноэкранный показ маркера ===== */
-.marker-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 20000;
-    background: #fff;
-    padding: 4vmin;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
-.marker-overlay.show { display: flex; }
-.marker-overlay-img {
-    max-width: min(80vmin, 90vw);
-    max-height: min(80vmin, 80vh);
-    width: auto;
-    height: auto;
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    box-shadow: 0 4px 30px rgba(0,0,0,0.15);
-}
-.marker-overlay-close {
-    position: fixed;
-    top: calc(env(safe-area-inset-top, 0px) + 16px);
-    right: calc(env(safe-area-inset-right, 0px) + 16px);
-    width: 46px; height: 46px;
-    border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.15);
-    background: #fff;
-    color: #111;
-    font-size: 22px;
-    font-weight: 500;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-}
-.marker-overlay-tip {
-    margin-top: 18px;
-    font-family: "JetBrains Mono";
-    font-size: 13px;
-    color: #444;
-    text-align: center;
-    max-width: 80vw;
-}
-
-.ar-controls {
-    position: absolute;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 30;
-    display: flex;
-    gap: 6px;
-    background: rgba(11,15,23,0.85);
-    backdrop-filter: blur(8px);
-    padding: 6px 8px;
-    border-radius: 30px;
-    border: 1px solid var(--line-2);
-}
-.ar-controls button {
-    padding: 7px 14px;
-    background: var(--bg-3);
-    color: var(--ink);
-    border: 1px solid var(--line-2);
-    border-radius: 20px;
-    font-size: 11.5px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background .2s, color .2s;
-}
-.ar-controls button:hover { background: var(--teal); color: #072120; border-color: var(--teal); }
-
-.ar-info {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    background: rgba(11,15,23,0.85);
-    backdrop-filter: blur(8px);
-    color: var(--ink);
-    padding: 5px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--line-2);
-    z-index: 30;
-    font-family: "JetBrains Mono";
-    font-size: 10.5px;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-}
-.marker-hint {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(11,15,23,0.9);
-    backdrop-filter: blur(8px);
-    color: var(--teal);
-    padding: 10px 16px;
-    border-radius: 10px;
-    z-index: 35;
-    font-family: "JetBrains Mono";
-    font-size: 11px;
-    letter-spacing: 0.05em;
-    border: 1px solid rgba(79,209,197,0.35);
-    box-shadow: 0 0 30px rgba(79,209,197,0.15);
+    z-index: 5;
     pointer-events: none;
-    transition: opacity .5s;
+}
+.ar-stage model-viewer {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    --poster-color: transparent;
+    --progress-bar-color: var(--teal);
 }
 
-/* Кнопки управления камерой */
-.camera-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 14px;
-}
-.cam-btn {
-    flex: 1;
-    padding: 12px;
-    border: 0;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-    transition: transform .15s, box-shadow .2s;
+/* Кнопка "Открыть в AR" — slot model-viewer */
+.ar-launch-btn {
+    position: absolute;
+    bottom: 16px; right: 16px;
+    z-index: 10;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
     gap: 8px;
-}
-.cam-btn.on {
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 30px;
     background: var(--teal);
     color: #072120;
-    box-shadow: 0 0 0 1px rgba(79,209,197,0.5), 0 8px 18px rgba(79,209,197,0.22);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    box-shadow: 0 0 0 1px rgba(79,209,197,0.5), 0 8px 22px rgba(79,209,197,0.32);
+    transition: transform .15s, box-shadow .2s;
 }
-.cam-btn.on:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(79,209,197,0.6), 0 12px 24px rgba(79,209,197,0.32); }
-.cam-btn.off {
-    background: var(--bg-2);
-    color: var(--ink);
-    border: 1px solid var(--line-2);
-}
-.cam-btn.off:hover { background: var(--bg-3); border-color: rgba(255,107,107,0.3); color: var(--red); }
+.ar-launch-btn:hover { transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(79,209,197,0.6), 0 14px 30px rgba(79,209,197,0.45); }
+.ar-launch-btn:active { transform: translateY(0); }
+.ar-launch-icon { display: inline-flex; }
+.ar-launch-icon svg { width: 18px; height: 18px; }
 
-/* Блок инструкций */
+/* Карточка с описанием текущего компонента */
+.ar-current {
+    margin-top: 16px;
+    padding: 18px 20px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+.ar-current h3 {
+    margin: 0 0 6px;
+    font-family: "Space Grotesk";
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+}
+.ar-current p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-dim);
+}
+
+/* Селектор моделей */
+.ar-thumbs-title {
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+    color: var(--ink-mute);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 22px 0 10px;
+}
+.ar-thumbs-title::before { content: "// "; color: var(--teal); }
+
+.ar-thumbs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+    gap: 8px;
+}
+.ar-thumb {
+    background: var(--bg-2);
+    border: 1px solid var(--line-2);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform .15s, border-color .15s, background .15s, color .15s;
+}
+.ar-thumb:hover {
+    transform: translateY(-2px);
+    border-color: rgba(79,209,197,0.5);
+    background: var(--bg-3);
+}
+.ar-thumb.active {
+    border-color: var(--teal);
+    background: rgba(79,209,197,0.10);
+    box-shadow: 0 0 0 1px rgba(79,209,197,0.4), 0 0 24px rgba(79,209,197,0.18);
+}
+.ar-thumb-icon { font-size: 1.6rem; color: var(--teal); line-height: 1; }
+.ar-thumb-name {
+    font-family: "JetBrains Mono";
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink-dim);
+    margin-top: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.ar-thumb.active .ar-thumb-name { color: var(--teal); }
+
+/* Инструкции */
 .ar-instructions {
     margin-top: 16px;
     padding: 18px 20px;
@@ -356,14 +155,6 @@ body.ar-fullscreen .ar-container {
     margin-bottom: 10px;
 }
 .ar-instructions strong::before { content: "// "; opacity: .6; }
-.ar-instructions ol {
-    margin: 0 0 10px 1.3rem;
-    padding: 0;
-}
-.ar-instructions li { margin-bottom: 5px; color: var(--ink); }
-.ar-instructions a {
-    color: var(--teal);
-    text-decoration: none;
-    border-bottom: 1px dashed rgba(79,209,197,0.4);
-}
-.ar-instructions a:hover { border-bottom-style: solid; }
+.ar-instructions ol { margin: 0 0 0 1.3rem; padding: 0; }
+.ar-instructions li { margin-bottom: 6px; color: var(--ink); }
+.ar-instructions b { color: var(--ink); font-weight: 600; }

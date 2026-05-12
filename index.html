@@ -113,7 +113,7 @@
         <div class="reveal">
             <div class="hero-eyebrow">
                 <span class="pulse"></span>
-                AR · WebGL · v2026.05 · build FLAT-ON-MARKER
+                AR · WebGL · v2026.05 · build MV-AR (Scene Viewer)
             </div>
             <h1>
                 Открой системный блок,<br>
@@ -426,58 +426,63 @@
     </section>
 </div>
 
-<!-- ===== AR-ТРЕНАЖЁР ===== -->
+<!-- ===== AR-ТРЕНАЖЁР (markerless через model-viewer / Scene Viewer) ===== -->
 <div id="ar" class="tab-content">
     <section class="section">
         <div class="sec-head reveal">
             <div>
-                <div class="sec-tag">AR Lab</div>
-                <h2>Тренажёр в дополненной реальности.</h2>
+                <div class="sec-tag">AR Lab · Markerless</div>
+                <h2>Размести компонент ПК в своей комнате.</h2>
             </div>
-            <p>Наведи камеру на маркер Hiro — над ним появится 3D-модель компонента.</p>
+            <p>Без маркеров и без приложений. Нажми «Открыть в AR» — компонент появится у тебя на столе или на полу. Можно подойти ближе, обойти со всех сторон.</p>
         </div>
 
-        <div class="ar-wrapper">
-            <div class="ar-container" id="arContainer">
-                <div class="ar-info" id="arInfoLabel">// CAMERA OFF</div>
-                <div class="marker-hint" id="markerHint">📸 Нажми «Включить камеру»</div>
-            </div>
+        <div class="ar-stage">
+            <model-viewer
+                id="arViewer"
+                camera-controls
+                touch-action="pan-y"
+                shadow-intensity="1.2"
+                exposure="1.1"
+                ar
+                ar-modes="webxr scene-viewer quick-look"
+                ar-scale="auto"
+                ar-placement="floor"
+                bounds="tight"
+                alt="3D-модель компонента ПК">
+                <button slot="ar-button" class="ar-launch-btn">
+                    <span class="ar-launch-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 7l9 5 9-5"/>
+                            <path d="M3 7v10l9 5 9-5V7"/>
+                            <path d="M12 12v10"/>
+                        </svg>
+                    </span>
+                    Открыть в AR
+                </button>
+            </model-viewer>
         </div>
 
-        <div class="camera-buttons">
-            <button class="cam-btn on" id="startCameraBtn">🎥 Включить камеру</button>
-            <button class="cam-btn off" id="stopCameraBtn">❌ Выключить камеру</button>
+        <div class="ar-current">
+            <h3 id="arCurrentName">Компонент</h3>
+            <p id="arCurrentDesc"></p>
         </div>
 
-        <div class="marker-actions">
-            <button class="marker-action-btn" onclick="openMarkerFullscreen()">
-                📲 Показать маркер на этом экране
-            </button>
-            <a class="marker-action-btn ghost" href="assets/markers/hiro.png" download="hiro.png">
-                📥 Скачать маркер для печати
-            </a>
-        </div>
+        <div class="ar-thumbs-title">Выбери компонент</div>
+        <div class="ar-thumbs" id="arThumbs"></div>
 
         <div class="ar-instructions">
-            <strong>Инструкция</strong>
+            <strong>Как открыть в AR</strong>
             <ol>
-                <li>Нажми «Включить камеру» и разреши доступ</li>
-                <li>Наведи камеру на маркер Hiro — можно <b>распечатать</b> или <b>открыть на другом экране</b> (компьютер, планшет, чужой телефон)</li>
-                <li>Под маркером появится 3D-модель компонента</li>
-                <li>Для выхода нажми кнопку ✕ в углу экрана</li>
+                <li>На <b>Android</b> нажми «Открыть в AR» — запустится Google Scene Viewer, камера сама найдёт пол/стол</li>
+                <li>На <b>iPhone</b> компонент откроется в полноэкранном 3D-просмотре (для настоящего AR на iOS нужны .usdz-файлы)</li>
+                <li>Прозрачное окно вокруг детали — это превью, его можно крутить пальцем</li>
             </ol>
             <p style="margin-top:12px;color:var(--ink-mute);font-size:13px">
-                💡 Совет: показывай маркер размером минимум <b>5×5 см</b>, держи под ним ровный фон, не закрывай рамку рукой.
+                💡 Размещение работает в Chrome / Edge / Samsung Internet на Android 8+ с поддержкой ARCore.
             </p>
         </div>
     </section>
-</div>
-
-<!-- ===== ПОКАЗ МАРКЕРА НА ВЕСЬ ЭКРАН ===== -->
-<div id="markerOverlay" class="marker-overlay">
-    <img src="assets/markers/hiro.png" alt="Маркер Hiro" class="marker-overlay-img">
-    <button class="marker-overlay-close" onclick="closeMarkerFullscreen()" aria-label="Закрыть">✕</button>
-    <div class="marker-overlay-tip">Наведи камеру с другого устройства на этот маркер</div>
 </div>
 
 <!-- ===== ИГРА СБОРКИ ===== -->
@@ -510,20 +515,7 @@
             </div>
         </div>
 
-        <div class="assembly-mode">
-            <button class="assembly-ar-toggle" id="assemblyArToggle" onclick="toggleAssemblyAR()">
-                <span class="dot"></span>
-                <span class="lbl-off">📷 Включить AR-фон</span>
-                <span class="lbl-on">🛑 Выключить AR-фон</span>
-            </button>
-            <div class="assembly-ar-hint" id="assemblyArHint">
-                После включения наведи камеру на маркер Hiro — он станет фоном под доской сборки.
-            </div>
-        </div>
-
-        <div class="assembly-board" id="assemblyBoard">
-            <div class="assembly-ar-layer" id="assemblyArLayer"></div>
-        </div>
+        <div class="assembly-board" id="assemblyBoard"></div>
 
         <div class="assembly-tray-title">Компоненты для установки</div>
         <div class="assembly-tray" id="assemblyTray"></div>
@@ -636,7 +628,6 @@
 <script src="js/viewer3d.js?v=20260512c"></script>
 <script src="js/ar-scene.js?v=20260512c"></script>
 <script src="js/assembly.js?v=20260512c"></script>
-<script src="js/assembly-ar.js?v=20260512c"></script>
 <script src="js/main.js?v=20260512c"></script>
 
 </body>
