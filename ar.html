@@ -155,78 +155,31 @@
               smooth="true" smoothCount="5"
               smoothTolerance="0.01" smoothThreshold="2">
 
-        <!-- Корпус ПК и все детали — внутри одной группы, чтобы было удобно
-             масштабировать сразу всё. scale=0.6 от маркера, чтобы помещалось в кадр. -->
-        <a-entity scale="0.6 0.6 0.6" position="0 0 0">
+        <!-- ВСЕГДА ВИДИМЫЕ объекты на маркере — доказывают что AR-рендер работает.
+             Все позиции/масштабы в "marker units" где 1 = ширина маркера. -->
 
-            <!-- Полупрозрачные стенки корпуса -->
-            <a-box position="0 0.4 0" scale="1.0 0.7 0.7"
-                   material="color: #4fd1c5; opacity: 0.10; transparent: true; side: double"></a-box>
+        <!-- Большой красный шар над маркером — должен быть виден сразу -->
+        <a-sphere id="alwaysVisible" position="0 0.3 0" radius="0.25"
+                  material="color: #ff6b6b; opacity: 0.95"></a-sphere>
 
-            <!-- 12 рёбер корпуса (толстые цилиндры) -->
-            <a-entity position="0 0.4 0">
-                <a-cylinder position="0 -0.35 0.35"  rotation="0 0 90" radius="0.015" height="1.0" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="0 -0.35 -0.35" rotation="0 0 90" radius="0.015" height="1.0" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="0.5 -0.35 0"   rotation="90 0 0" radius="0.015" height="0.7" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="-0.5 -0.35 0"  rotation="90 0 0" radius="0.015" height="0.7" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="0 0.35 0.35"   rotation="0 0 90" radius="0.015" height="1.0" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="0 0.35 -0.35"  rotation="0 0 90" radius="0.015" height="1.0" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="0.5 0.35 0"    rotation="90 0 0" radius="0.015" height="0.7" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="-0.5 0.35 0"   rotation="90 0 0" radius="0.015" height="0.7" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="0.5 0 0.35"    radius="0.015" height="0.7" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="-0.5 0 0.35"   radius="0.015" height="0.7" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="0.5 0 -0.35"   radius="0.015" height="0.7" color="#4fd1c5"></a-cylinder>
-                <a-cylinder position="-0.5 0 -0.35"  radius="0.015" height="0.7" color="#4fd1c5"></a-cylinder>
-            </a-entity>
+        <!-- Подпись -->
+        <a-text value="PC CASE" position="0 0.9 0" align="center"
+                color="#4fd1c5" scale="0.4 0.4 0.4"></a-text>
 
-            <a-text value="PC CASE" position="0 0.85 0" align="center"
-                    color="#4fd1c5" scale="0.2 0.2 0.2"></a-text>
-
-            <!-- Детали — все находятся ВНУТРИ корпуса -->
-            <a-entity id="part-mb" visible="false">
-                <a-box position="0 0.10 0" scale="0.8 0.04 0.45"
-                       material="color: #5b8ef7; opacity: 0.95"></a-box>
-                <a-text value="MB" position="0 0.14 0" align="center"
-                        color="#fff" scale="0.12 0.12 0.12"></a-text>
-            </a-entity>
-
-            <a-entity id="part-cpu" visible="false">
-                <a-box position="-0.22 0.15 -0.08" scale="0.12 0.04 0.12"
-                       material="color: #e8b65a; opacity: 0.95"></a-box>
-                <a-text value="CPU" position="-0.22 0.20 -0.08" align="center"
-                        color="#fff" scale="0.07 0.07 0.07"></a-text>
-            </a-entity>
-
-            <a-entity id="part-ram" visible="false">
-                <a-box position="0.05 0.15 -0.05" scale="0.03 0.08 0.32"
-                       material="color: #7cd992; opacity: 0.95"></a-box>
-                <a-box position="0.12 0.15 -0.05" scale="0.03 0.08 0.32"
-                       material="color: #7cd992; opacity: 0.95"></a-box>
-                <a-text value="RAM" position="0.085 0.22 -0.05" align="center"
-                        color="#fff" scale="0.07 0.07 0.07"></a-text>
-            </a-entity>
-
-            <a-entity id="part-gpu" visible="false">
-                <a-box position="0 0.15 0.15" scale="0.60 0.05 0.13"
-                       material="color: #a78bfa; opacity: 0.95"></a-box>
-                <a-text value="GPU" position="0 0.20 0.15" align="center"
-                        color="#fff" scale="0.08 0.08 0.08"></a-text>
-            </a-entity>
-
-            <a-entity id="part-ssd" visible="false">
-                <a-box position="0.38 0.30 0.18" scale="0.06 0.12 0.16"
-                       material="color: #e6ecf5; opacity: 0.95"></a-box>
-                <a-text value="SSD" position="0.38 0.40 0.18" align="center"
-                        color="#000" scale="0.06 0.06 0.06"></a-text>
-            </a-entity>
-
-            <a-entity id="part-psu" visible="false">
-                <a-box position="0.30 0.58 -0.18" scale="0.35 0.22 0.28"
-                       material="color: #ff8c5a; opacity: 0.95"></a-box>
-                <a-text value="PSU" position="0.30 0.72 -0.18" align="center"
-                        color="#fff" scale="0.08 0.08 0.08"></a-text>
-            </a-entity>
-        </a-entity>
+        <!-- 6 деталей-боксов в виде сетки 3x2 над маркером.
+             Изначально скрыты, появляются по нажатию кнопок. -->
+        <a-box id="part-mb"  position="-0.35  0.30 -0.25" scale="0.25 0.25 0.25"
+               material="color: #5b8ef7" visible="false"></a-box>
+        <a-box id="part-cpu" position=" 0.00  0.30 -0.25" scale="0.25 0.25 0.25"
+               material="color: #e8b65a" visible="false"></a-box>
+        <a-box id="part-ram" position=" 0.35  0.30 -0.25" scale="0.25 0.25 0.25"
+               material="color: #7cd992" visible="false"></a-box>
+        <a-box id="part-gpu" position="-0.35  0.30  0.10" scale="0.25 0.25 0.25"
+               material="color: #a78bfa" visible="false"></a-box>
+        <a-box id="part-ssd" position=" 0.00  0.30  0.10" scale="0.25 0.25 0.25"
+               material="color: #e6ecf5" visible="false"></a-box>
+        <a-box id="part-psu" position=" 0.35  0.30  0.10" scale="0.25 0.25 0.25"
+               material="color: #ff8c5a" visible="false"></a-box>
     </a-marker>
 
     <a-entity camera></a-entity>
