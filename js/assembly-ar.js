@@ -48,9 +48,14 @@ function destroyAssemblyAR() {
     }
     assemblyArScene = null;
 
-    // Снять класс ar-mode с доски
+    // Снять класс ar-mode с доски и защитный ar-active с body/html.
+    // Класс на body/html снимаем только если AR-вкладка тоже не активна.
     const board = document.getElementById('assemblyBoard');
     if (board) board.classList.remove('ar-mode');
+    if (!isCameraOn) {
+        document.body.classList.remove('ar-active');
+        document.documentElement.classList.remove('ar-active');
+    }
 
     // Восстановить стили body/html
     if (assemblyArBodyStyle !== null) {
@@ -109,19 +114,29 @@ function createAssemblyAR() {
     layer.appendChild(scene);
     assemblyArScene = scene;
 
-    // Активируем AR-режим доски
+    // Активируем AR-режим доски + защитный класс на body/html
     board.classList.add('ar-mode');
+    document.body.classList.add('ar-active');
+    document.documentElement.classList.add('ar-active');
 
     // MutationObserver: ловим появление video AR.js и сразу паркуем в слой
     const parkInto = (target) => {
         const video = document.getElementById('arjs-video');
         if (!video) return;
         if (video.parentNode !== target) target.appendChild(video);
+        // iOS Safari: без playsinline/muted/autoplay видео не запустится inline
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+        video.setAttribute('muted', '');
+        video.setAttribute('autoplay', '');
+        video.muted = true;
+        video.playsInline = true;
         video.style.cssText =
             'position:absolute!important;top:0!important;left:0!important;' +
             'width:100%!important;height:100%!important;object-fit:cover!important;' +
             'margin:0!important;padding:0!important;transform:none!important;' +
             'z-index:1!important;display:block!important;opacity:1!important;';
+        try { const p = video.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
         document.querySelectorAll('body > canvas.a-canvas').forEach(c => {
             target.appendChild(c);
         });

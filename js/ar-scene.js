@@ -79,6 +79,9 @@ function destroyARScene() {
         savedHtmlStyle = null;
     }
 
+    document.body.classList.remove('ar-active');
+    document.documentElement.classList.remove('ar-active');
+
     isCameraOn = false;
     const info = document.getElementById('arInfoLabel');
     const hint = document.getElementById('markerHint');
@@ -99,6 +102,13 @@ function parkArjsVideo(container) {
     if (video.parentNode !== container) {
         container.appendChild(video);
     }
+    // iOS Safari требует playsinline + muted + autoplay, иначе video не играет inline
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    video.setAttribute('muted', '');
+    video.setAttribute('autoplay', '');
+    video.muted = true;
+    video.playsInline = true;
     video.style.cssText =
         'position:absolute!important;' +
         'top:0!important;left:0!important;' +
@@ -109,6 +119,8 @@ function parkArjsVideo(container) {
         'transform:none!important;' +
         'display:block!important;' +
         'opacity:1!important;';
+    // Запустить воспроизведение принудительно (iOS любит явный play)
+    try { const p = video.play(); if (p && p.catch) p.catch(() => {}); } catch (e) {}
     // Также перенесём канвас A-Frame если он каким-то образом оторвался в body
     document.querySelectorAll('body > canvas.a-canvas').forEach(c => {
         container.appendChild(c);
@@ -179,6 +191,10 @@ function createARScene() {
     container.appendChild(scene);
     currentScene = scene;
     isCameraOn = true;
+
+    // CSS-класс с !important-правилами защищает body/html от попыток AR.js поменять их inline-стили
+    document.body.classList.add('ar-active');
+    document.documentElement.classList.add('ar-active');
 
     // AR.js создаёт <video> асинхронно после getUserMedia. MutationObserver
     // мгновенно поймает появление видео и припаркует его в контейнер,

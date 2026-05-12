@@ -84,6 +84,21 @@ body > canvas.a-canvas {
     z-index: -1 !important;
 }
 
+/* Когда AR активен — перебиваем любые inline-стили, которые AR.js пытается навесить
+   на html/body (margin, padding, overflow и т.п.), чтобы вёрстка не съезжала.
+   Эти !important побеждают inline-style без !important, которые ставит AR.js. */
+html.ar-active,
+body.ar-active {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+html.ar-active { overflow: auto !important; }
+body.ar-active {
+    overflow-x: hidden !important;
+    min-height: 100vh !important;
+    position: static !important;
+}
+
 .ar-controls {
     position: absolute;
     bottom: 14px;

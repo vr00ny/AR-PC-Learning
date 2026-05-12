@@ -14,6 +14,16 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
+    <!-- Мобильная консоль (только если в URL ?debug=1) — для отладки на телефоне -->
+    <script>
+        if (location.search.indexOf('debug=1') !== -1) {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.jsdelivr.net/npm/eruda';
+            s.onload = function () { eruda.init(); };
+            document.head.appendChild(s);
+        }
+    </script>
+
     <!-- 3D-просмотрщик от Google -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
 
