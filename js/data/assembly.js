@@ -29,7 +29,7 @@ const assemblyData = {
     ],
     components: [
         { type: 'mobo',   icon: '🔲', name: 'Материнская плата', model: 'assets/models/motherboard.glb' },
-        { type: 'cooler', icon: '🌀', name: 'Кулер CPU'           /* без модели — cpu.glb весит 81МБ */ },
+        { type: 'cooler', icon: '🌀', name: 'Кулер CPU',          model: 'assets/models/cooler.glb' },
         { type: 'psu',    icon: '🔌', name: 'Блок питания',       model: 'assets/models/psu_real.glb' },
         { type: 'gpu',    icon: '🎮', name: 'Видеокарта',         model: 'assets/models/gpu_real.glb' },
         { type: 'ssd',    icon: '💿', name: 'SSD',                model: 'assets/models/ssd_real.glb' },
