@@ -21,6 +21,22 @@
     --body-glow-1: rgba(91,142,247,0.10);
     --body-glow-2: rgba(79,209,197,0.07);
 }
+/* В светлой теме цвета акцентов (teal/green/blue) становятся тёмными, поэтому
+   тёмно-зелёный текст на них (#072120 и т.п.) становится невидимым.
+   Перебиваем их на светлый текст для кнопок с teal/green/amber background. */
+:root[data-theme="light"] .top-cta,
+:root[data-theme="light"] .btn-primary,
+:root[data-theme="light"] .cam-btn.on,
+:root[data-theme="light"] .quiz-button,
+:root[data-theme="light"] .assembly-win button,
+:root[data-theme="light"] .assembly-board.ar-mode .assembly-slot.highlight,
+:root[data-theme="light"] .assembly-board.ar-mode .assembly-slot.filled,
+:root[data-theme="light"] .ar-launch-btn,
+:root[data-theme="light"] .viewer-btn:hover,
+:root[data-theme="light"] .ar-controls button:hover {
+    color: #ffffff !important;
+}
+
 /* Светлая "учебная" тема (палитра из макета v2: бежевый фон + earth-акценты) */
 :root[data-theme="light"] {
     --bg: #f5f3ee;
