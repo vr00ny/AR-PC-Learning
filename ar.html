@@ -113,6 +113,47 @@
         }
         .parts button.done .ic::after { content: " ✓"; }
         .parts button:disabled { cursor: default; }
+        /* Следующая правильная деталь — бирюзовая пульсация */
+        .parts button.next {
+            border-color: rgba(79,209,197,0.85) !important;
+            background: rgba(79,209,197,0.12) !important;
+            box-shadow: 0 0 0 2px rgba(79,209,197,0.5), 0 0 16px rgba(79,209,197,0.4);
+            animation: nextPulse 1.4s ease-in-out infinite;
+        }
+        @keyframes nextPulse {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(79,209,197,0.5), 0 0 16px rgba(79,209,197,0.35); }
+            50%      { box-shadow: 0 0 0 4px rgba(79,209,197,0.85), 0 0 22px rgba(79,209,197,0.65); }
+        }
+        /* Ошибка — нажали не тот компонент */
+        .parts button.wrong {
+            background: rgba(255,107,107,0.40) !important;
+            border-color: #ff6b6b !important;
+            color: #fff !important;
+            animation: wrongShake 0.45s;
+        }
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            20%      { transform: translateX(-5px); }
+            40%      { transform: translateX(5px); }
+            60%      { transform: translateX(-3px); }
+            80%      { transform: translateX(3px); }
+        }
+        /* Под прогрессом подсказка какой компонент следующий */
+        .next-hint {
+            position: fixed;
+            top: 46px; right: 70px;
+            z-index: 100;
+            background: rgba(79,209,197,0.18);
+            border: 1px solid rgba(79,209,197,0.5);
+            color: #4fd1c5;
+            padding: 4px 10px; border-radius: 14px;
+            font: 600 10.5px/1 "JetBrains Mono", monospace;
+            letter-spacing: .05em;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            max-width: 60vw;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .next-hint span { opacity: 0.7; margin-right: 4px; }
 
         /* Информационная плашка про установленный компонент */
         .part-info {
@@ -251,6 +292,7 @@
 <div class="status" id="status">// SEARCHING…</div>
 <div class="hint" id="hint">🎯 Наведи камеру на маркер Kanji</div>
 <div class="progress"><span>СОБРАНО</span><b id="progressN">0</b>/6</div>
+<div class="next-hint" id="nextHint"><span>СЛЕДУЮЩИЙ:</span><b id="nextHintName">…</b></div>
 <button class="exit-btn" id="exitBtn" aria-label="Выйти">✕</button>
 
 <div class="part-info" id="partInfo">
@@ -339,11 +381,43 @@ marker.addEventListener('markerLost', function () {
     hint.classList.remove('hidden');
 });
 
-// Логика сборки
-const parts = ['mb', 'cpu', 'ram', 'gpu', 'ssd', 'psu'];
+// Логика сборки. Порядок отражает реальный процесс:
+// 1. Материнка — основа, ставится первой
+// 2. Процессор — в сокет на материнке
+// 3. RAM — в DIMM-слоты возле процессора
+// 4. Блок питания — в свой отсек (теперь можно подключать питание)
+// 5. Видеокарта — в PCIe и питание от БП
+// 6. SSD — в M.2 на материнке или в отсек
+const sequence = ['mb', 'cpu', 'ram', 'psu', 'gpu', 'ssd'];
+let currentStep = 0;
+const partNames = {
+    mb: 'Материнская плата',
+    cpu: 'Процессор',
+    ram: 'RAM',
+    psu: 'Блок питания',
+    gpu: 'Видеокарта',
+    ssd: 'SSD'
+};
+
+const parts = sequence;
 const placed = new Set();
 const progressN = document.getElementById('progressN');
 const doneMsg = document.getElementById('doneMsg');
+const nextHint = document.getElementById('nextHint');
+const nextHintName = document.getElementById('nextHintName');
+
+function updateNextHint() {
+    document.querySelectorAll('[data-part]').forEach(function (b) { b.classList.remove('next'); });
+    if (currentStep < sequence.length) {
+        const id = sequence[currentStep];
+        const btn = document.querySelector('[data-part="' + id + '"]');
+        if (btn) btn.classList.add('next');
+        nextHintName.textContent = partNames[id] || id;
+        nextHint.style.display = '';
+    } else {
+        nextHint.style.display = 'none';
+    }
+}
 
 // Информационные сводки про каждый компонент: куда ставится и как связан с другими
 const partInfo = {
@@ -440,31 +514,47 @@ function setPartVisible(id, on) {
 document.querySelectorAll('[data-part]').forEach(function (btn) {
     btn.onclick = function () {
         const id = btn.dataset.part;
-        if (placed.has(id)) {
-            // Если уже установлен — просто показываем инфо ещё раз
-            showInfo(id);
+
+        // Уже установлен — показываем инфо
+        if (placed.has(id)) { showInfo(id); return; }
+
+        // Не та деталь в последовательности — мигаем красным
+        const expected = sequence[currentStep];
+        if (id !== expected) {
+            btn.classList.add('wrong');
+            setTimeout(function () { btn.classList.remove('wrong'); }, 600);
             return;
         }
+
+        // Правильная очередь — устанавливаем
         placed.add(id);
+        currentStep++;
         setPartVisible(id, true);
         showInfo(id);
         btn.classList.add('done');
         progressN.textContent = placed.size;
+        updateNextHint();
+
         if (placed.size === parts.length) {
             setTimeout(function () { doneMsg.classList.add('show'); }, 600);
         }
     };
 });
 
+// Инициализация подсказки
+updateNextHint();
+
 function resetAR() {
     placed.clear();
+    currentStep = 0;
     parts.forEach(function (id) { setPartVisible(id, false); });
     document.querySelectorAll('[data-part]').forEach(function (b) {
-        b.classList.remove('done');
+        b.classList.remove('done', 'wrong', 'next');
     });
     progressN.textContent = '0';
     doneMsg.classList.remove('show');
     hideInfo();
+    updateNextHint();
 }
 
 document.getElementById('exitBtn').onclick = function () {
