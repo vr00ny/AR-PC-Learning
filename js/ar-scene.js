@@ -10,15 +10,11 @@ let arIframeListener = null;
 function loadAR() {
     const viewer = document.getElementById('arViewer');
     const thumbs = document.getElementById('arThumbs');
-    const nameEl = document.getElementById('arCurrentName');
-    const descEl = document.getElementById('arCurrentDesc');
     if (!viewer || !thumbs || !window.models3dData) return;
 
     function setModel(m) {
         viewer.src = m.src;
         viewer.setAttribute('alt', m.name);
-        nameEl.textContent = m.name;
-        descEl.textContent = m.description;
         thumbs.querySelectorAll('.ar-thumb').forEach(t => {
             t.classList.toggle('active', t.dataset.id === m.id);
         });
