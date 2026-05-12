@@ -323,13 +323,34 @@ const placed = new Set();
 const progressN = document.getElementById('progressN');
 const doneMsg = document.getElementById('doneMsg');
 
+// Двойная установка видимости: attribute + Three.js object3D.
+// setAttribute('visible', 'true') в A-Frame не всегда пропагируется на детей,
+// особенно когда entity — обёртка с a-box/a-text внутри.
+function setPartVisible(id, on) {
+    const el = document.getElementById('part-' + id);
+    if (!el) return;
+    const apply = function () {
+        el.setAttribute('visible', on ? 'true' : 'false');
+        if (el.object3D) {
+            el.object3D.visible = !!on;
+            el.object3D.traverse(function (o) { o.visible = !!on; });
+        }
+        el.querySelectorAll('*').forEach(function (child) {
+            child.setAttribute('visible', on ? 'true' : 'false');
+            if (child.object3D) child.object3D.visible = !!on;
+        });
+    };
+    // Если object3D ещё не создан — подождём loaded
+    if (el.object3D) apply();
+    else el.addEventListener('loaded', apply, { once: true });
+}
+
 document.querySelectorAll('[data-part]').forEach(function (btn) {
     btn.onclick = function () {
         const id = btn.dataset.part;
         if (placed.has(id)) return;
         placed.add(id);
-        const el = document.getElementById('part-' + id);
-        if (el) el.setAttribute('visible', 'true');
+        setPartVisible(id, true);
         btn.classList.add('done');
         btn.disabled = true;
         progressN.textContent = placed.size;
@@ -341,10 +362,7 @@ document.querySelectorAll('[data-part]').forEach(function (btn) {
 
 function resetAR() {
     placed.clear();
-    parts.forEach(function (id) {
-        const el = document.getElementById('part-' + id);
-        if (el) el.setAttribute('visible', 'false');
-    });
+    parts.forEach(function (id) { setPartVisible(id, false); });
     document.querySelectorAll('[data-part]').forEach(function (b) {
         b.classList.remove('done');
         b.disabled = false;
