@@ -64,8 +64,8 @@ function renderAssemblyTray() {
         const visual = c.model
             ? `<model-viewer src="${c.model}" alt="${c.name}" auto-rotate
                   rotation-per-second="30deg" disable-zoom disable-tap interaction-prompt="none"
-                  camera-orbit="45deg 70deg auto" shadow-intensity="0"
-                  exposure="1" class="tray-item-model"></model-viewer>`
+                  bounds="tight" shadow-intensity="0" exposure="1.1"
+                  class="tray-item-model"></model-viewer>`
             : `<div class="tray-item-icon">${c.icon}</div>`;
         div.innerHTML = `${visual}<div class="tray-item-name">${c.name}</div>`;
         attachDragHandlers(div);
@@ -186,7 +186,7 @@ function placeItemInSlot(item, slot) {
     if (component.model) {
         slot.innerHTML = `<model-viewer src="${component.model}" alt="${component.name}"
             auto-rotate rotation-per-second="20deg" disable-zoom disable-tap
-            interaction-prompt="none" shadow-intensity="0" exposure="1"
+            interaction-prompt="none" bounds="tight" shadow-intensity="0" exposure="1.1"
             class="slot-model"></model-viewer>`;
     } else {
         slot.innerHTML = component.icon;
