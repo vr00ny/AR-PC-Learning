@@ -157,6 +157,86 @@ body.ar-fullscreen .ar-container {
 }
 .ar-exit-btn:active { transform: scale(0.94); }
 
+/* ===== Кнопки действий с маркером ===== */
+.marker-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+}
+.marker-action-btn {
+    flex: 1 1 200px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--line-2);
+    background: var(--bg-2);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background .2s, border-color .2s, color .2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.marker-action-btn:hover {
+    background: var(--bg-3);
+    border-color: var(--teal);
+    color: var(--teal);
+}
+.marker-action-btn.ghost {
+    background: transparent;
+}
+
+/* ===== Полноэкранный показ маркера ===== */
+.marker-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 20000;
+    background: #fff;
+    padding: 4vmin;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.marker-overlay.show { display: flex; }
+.marker-overlay-img {
+    max-width: min(80vmin, 90vw);
+    max-height: min(80vmin, 80vh);
+    width: auto;
+    height: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    box-shadow: 0 4px 30px rgba(0,0,0,0.15);
+}
+.marker-overlay-close {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 16px);
+    right: calc(env(safe-area-inset-right, 0px) + 16px);
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.15);
+    background: #fff;
+    color: #111;
+    font-size: 22px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.marker-overlay-tip {
+    margin-top: 18px;
+    font-family: "JetBrains Mono";
+    font-size: 13px;
+    color: #444;
+    text-align: center;
+    max-width: 80vw;
+}
+
 .ar-controls {
     position: absolute;
     bottom: 14px;

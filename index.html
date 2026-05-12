@@ -446,17 +446,35 @@
             <button class="cam-btn off" id="stopCameraBtn">❌ Выключить камеру</button>
         </div>
 
+        <div class="marker-actions">
+            <button class="marker-action-btn" onclick="openMarkerFullscreen()">
+                📲 Показать маркер на этом экране
+            </button>
+            <a class="marker-action-btn ghost" href="assets/markers/hiro.png" download="hiro.png">
+                📥 Скачать маркер для печати
+            </a>
+        </div>
+
         <div class="ar-instructions">
             <strong>Инструкция</strong>
             <ol>
                 <li>Нажми «Включить камеру» и разреши доступ</li>
-                <li>Наведи камеру на маркер Hiro (его можно скачать ниже)</li>
-                <li>Используй кнопки в нижней панели, чтобы переключать модели</li>
-                <li>Для выхода нажми «Выключить камеру»</li>
+                <li>Наведи камеру на маркер Hiro — можно <b>распечатать</b> или <b>открыть на другом экране</b> (компьютер, планшет, чужой телефон)</li>
+                <li>Под маркером появится 3D-модель компонента</li>
+                <li>Для выхода нажми кнопку ✕ в углу экрана</li>
             </ol>
-            <a href="https://ar-js-org.github.io/AR.js/aframe/examples/basic/pattern-files/pattern-hiro.png" target="_blank">📥 Скачать маркер Hiro</a>
+            <p style="margin-top:12px;color:var(--ink-mute);font-size:13px">
+                💡 Совет: показывай маркер размером минимум <b>5×5 см</b>, держи под ним ровный фон, не закрывай рамку рукой.
+            </p>
         </div>
     </section>
+</div>
+
+<!-- ===== ПОКАЗ МАРКЕРА НА ВЕСЬ ЭКРАН ===== -->
+<div id="markerOverlay" class="marker-overlay">
+    <img src="assets/markers/hiro.png" alt="Маркер Hiro" class="marker-overlay-img">
+    <button class="marker-overlay-close" onclick="closeMarkerFullscreen()" aria-label="Закрыть">✕</button>
+    <div class="marker-overlay-tip">Наведи камеру с другого устройства на этот маркер</div>
 </div>
 
 <!-- ===== ИГРА СБОРКИ ===== -->
