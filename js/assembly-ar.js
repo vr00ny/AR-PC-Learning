@@ -11,12 +11,12 @@ let assemblyArOn = false;
 let assemblyArBodyStyle = null;
 let assemblyArHtmlStyle = null;
 let assemblyArBodyChildren = null;
-let assemblyArParkInterval = null;
+let assemblyArObserver = null;
 
 function destroyAssemblyAR() {
-    if (assemblyArParkInterval) {
-        clearInterval(assemblyArParkInterval);
-        assemblyArParkInterval = null;
+    if (assemblyArObserver) {
+        assemblyArObserver.disconnect();
+        assemblyArObserver = null;
     }
 
     // Остановить все video-стримы (если открыта AR-вкладка одновременно — она перезахватит)
@@ -112,24 +112,28 @@ function createAssemblyAR() {
     // Активируем AR-режим доски
     board.classList.add('ar-mode');
 
-    // Паркуем video AR.js внутрь слоя
-    assemblyArParkInterval = setInterval(() => {
+    // MutationObserver: ловим появление video AR.js и сразу паркуем в слой
+    const parkInto = (target) => {
         const video = document.getElementById('arjs-video');
         if (!video) return;
-        if (video.parentNode !== layer) layer.appendChild(video);
+        if (video.parentNode !== target) target.appendChild(video);
         video.style.cssText =
             'position:absolute!important;top:0!important;left:0!important;' +
             'width:100%!important;height:100%!important;object-fit:cover!important;' +
-            'margin:0!important;padding:0!important;transform:none!important;z-index:1!important;';
-        clearInterval(assemblyArParkInterval);
-        assemblyArParkInterval = null;
-    }, 150);
-    setTimeout(() => {
-        if (assemblyArParkInterval) {
-            clearInterval(assemblyArParkInterval);
-            assemblyArParkInterval = null;
-        }
-    }, 10000);
+            'margin:0!important;padding:0!important;transform:none!important;' +
+            'z-index:1!important;display:block!important;opacity:1!important;';
+        document.querySelectorAll('body > canvas.a-canvas').forEach(c => {
+            target.appendChild(c);
+        });
+    };
+    assemblyArObserver = new MutationObserver(() => parkInto(layer));
+    assemblyArObserver.observe(document.body, {
+        childList: true,
+        subtree: false,
+        attributes: true,
+        attributeFilter: ['style']
+    });
+    parkInto(layer);
 
     assemblyArOn = true;
     const toggle = document.getElementById('assemblyArToggle');

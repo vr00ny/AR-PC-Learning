@@ -13,7 +13,7 @@ let currentScene = null;
 let isCameraOn = false;
 let savedBodyStyle = null;
 let savedHtmlStyle = null;
-let videoParkInterval = null;
+let videoParkObserver = null;
 
 // Снимок элементов body ДО запуска AR — чтобы после удалить только то, что AR.js добавил
 let bodyChildrenSnapshot = null;
@@ -34,9 +34,9 @@ function stopAllCameraStreams() {
 
 function destroyARScene() {
     // Перестать следить за видео-элементом
-    if (videoParkInterval) {
-        clearInterval(videoParkInterval);
-        videoParkInterval = null;
+    if (videoParkObserver) {
+        videoParkObserver.disconnect();
+        videoParkObserver = null;
     }
 
     // 1) Гасим камеру — иначе индикатор в браузере останется гореть
@@ -106,8 +106,31 @@ function parkArjsVideo(container) {
         'object-fit:cover!important;' +
         'z-index:1!important;' +
         'margin:0!important;padding:0!important;' +
-        'transform:none!important;';
+        'transform:none!important;' +
+        'display:block!important;' +
+        'opacity:1!important;';
+    // Также перенесём канвас A-Frame если он каким-то образом оторвался в body
+    document.querySelectorAll('body > canvas.a-canvas').forEach(c => {
+        container.appendChild(c);
+    });
     return true;
+}
+
+function watchForArjsVideo(container) {
+    // MutationObserver реагирует на появление video мгновенно — быстрее polling'а.
+    // Также подчищает inline-стили body, которые AR.js навешивает (margin:0, overflow и т.п.).
+    const observer = new MutationObserver(() => {
+        parkArjsVideo(container);
+    });
+    observer.observe(document.body, {
+        childList: true,
+        subtree: false,
+        attributes: true,
+        attributeFilter: ['style']
+    });
+    // Первая попытка сразу — на случай если видео уже создано
+    parkArjsVideo(container);
+    return observer;
 }
 
 function createARScene() {
@@ -157,21 +180,10 @@ function createARScene() {
     currentScene = scene;
     isCameraOn = true;
 
-    // AR.js создаёт <video> асинхронно, после getUserMedia.
-    // Раз в 150 мс проверяем — как только появился, паркуем в контейнер.
-    videoParkInterval = setInterval(() => {
-        if (parkArjsVideo(container)) {
-            clearInterval(videoParkInterval);
-            videoParkInterval = null;
-        }
-    }, 150);
-    // Подстраховка — если что-то пойдёт не так, перестанем спамить через 10с
-    setTimeout(() => {
-        if (videoParkInterval) {
-            clearInterval(videoParkInterval);
-            videoParkInterval = null;
-        }
-    }, 10000);
+    // AR.js создаёт <video> асинхронно после getUserMedia. MutationObserver
+    // мгновенно поймает появление видео и припаркует его в контейнер,
+    // плюс будет откатывать изменения inline-стилей body.
+    videoParkObserver = watchForArjsVideo(container);
 
     // Кнопки переключения моделей
     const controlsDiv = document.createElement('div');

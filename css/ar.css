@@ -41,9 +41,11 @@
 }
 a-scene:not(.ar-container a-scene) { display: none !important; }
 
-/* Видео AR.js должно жить только внутри контейнера — иначе оно растягивается на весь экран */
+/* Видео AR.js внутри контейнера — занимает всю рамку */
 .ar-container video,
-.ar-container #arjs-video {
+.ar-container #arjs-video,
+.assembly-ar-layer video,
+.assembly-ar-layer #arjs-video {
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
@@ -54,12 +56,33 @@ a-scene:not(.ar-container a-scene) { display: none !important; }
     padding: 0 !important;
     transform: none !important;
     z-index: 1 !important;
+    display: block !important;
 }
-/* Любое видео AR.js, оставшееся вне нашего контейнера — скрыть */
-body > video#arjs-video,
-body > video[id^="arjs"] { display: none !important; }
-/* Запас прочности: канвасы A-Frame / AR.js, если оторвутся в body */
-body > canvas.a-canvas { display: none !important; }
+
+/* Пока видео ещё не переехало в контейнер — даём ему минимальный размер,
+   чтобы AR.js не растягивал его на весь экран и не ломал вёрстку.
+   В контейнере приведённое выше правило вернёт ему 100%. */
+body > video#arjs-video {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+}
+/* Аналогично для канвасов A-Frame, если они оторвутся в body */
+body > canvas.a-canvas {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    z-index: -1 !important;
+}
 
 .ar-controls {
     position: absolute;
