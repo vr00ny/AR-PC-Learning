@@ -73,7 +73,7 @@
 .viewer-btn:hover { background: var(--bg-2); border-color: rgba(79,209,197,0.3); color: var(--teal); }
 .viewer-btn.active {
     background: var(--teal);
-    color: #072120;
+    color: var(--on-accent);
     border-color: var(--teal);
     box-shadow: 0 0 0 1px rgba(79,209,197,0.5), 0 6px 16px rgba(79,209,197,0.18);
 }

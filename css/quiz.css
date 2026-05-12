@@ -267,7 +267,7 @@
 .quiz-button {
     padding: 13px 22px;
     background: var(--teal);
-    color: #072120;
+    color: var(--on-accent);
     border: 0;
     border-radius: 10px;
     cursor: pointer;

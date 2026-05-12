@@ -268,7 +268,7 @@
     margin-top: 14px;
     padding: 12px 22px;
     background: var(--teal);
-    color: #072120;
+    color: var(--on-accent);
     border: 0;
     border-radius: 25px;
     font-family: inherit;
@@ -417,11 +417,11 @@
 }
 .assembly-board.ar-mode .assembly-slot.highlight {
     background: rgba(232,182,90,0.7);
-    color: #1a1306;
+    color: var(--on-accent);
 }
 .assembly-board.ar-mode .assembly-slot.filled {
     background: rgba(124,217,146,0.78);
-    color: #062110;
+    color: var(--on-accent);
 }
 
 /* ===== Fullscreen-режим AR-сборки ===== */

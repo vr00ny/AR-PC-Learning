@@ -20,44 +20,35 @@
     --grid-line: rgba(140,170,210,0.05);
     --body-glow-1: rgba(91,142,247,0.10);
     --body-glow-2: rgba(79,209,197,0.07);
-}
-/* В светлой теме цвета акцентов (teal/green/blue) становятся тёмными, поэтому
-   тёмно-зелёный текст на них (#072120 и т.п.) становится невидимым.
-   Перебиваем их на светлый текст для кнопок с teal/green/amber background. */
-:root[data-theme="light"] .top-cta,
-:root[data-theme="light"] .btn-primary,
-:root[data-theme="light"] .cam-btn.on,
-:root[data-theme="light"] .quiz-button,
-:root[data-theme="light"] .assembly-win button,
-:root[data-theme="light"] .assembly-board.ar-mode .assembly-slot.highlight,
-:root[data-theme="light"] .assembly-board.ar-mode .assembly-slot.filled,
-:root[data-theme="light"] .ar-launch-btn,
-:root[data-theme="light"] .viewer-btn:hover,
-:root[data-theme="light"] .ar-controls button:hover {
-    color: #ffffff !important;
+    --topbar-bg: rgba(11,15,23,0.72);
+    --surface-translucent: rgba(15,20,29,0.5);
+    --on-accent: #072120; /* тёмный текст на ярких бирюзовых кнопках */
 }
 
-/* Светлая "учебная" тема (палитра из макета v2: бежевый фон + earth-акценты) */
+/* Светлая тема — холодная цифровая палитра (синяя, не бежевая) */
 :root[data-theme="light"] {
-    --bg: #f5f3ee;
-    --bg-2: #ece8df;
-    --bg-3: #fbfaf6;
+    --bg: #f5f6fa;
+    --bg-2: #eceff5;
+    --bg-3: #dee3ed;
     --panel: #ffffff;
-    --ink: #1d2230;
-    --ink-dim: #5a6275;
-    --ink-mute: #8a91a3;
-    --line: rgba(29,34,48,0.08);
-    --line-2: rgba(29,34,48,0.14);
-    --teal: #3a5a78;   /* slate-blue */
-    --blue: #4a6fa5;
-    --green: #7c8a76;  /* sage */
-    --amber: #b08968;  /* warm tan */
-    --purple: #8b7aa6; /* muted lavender */
-    --red: #c45c5c;
-    --trace: rgba(58,90,120,0.45);
-    --grid-line: rgba(29,34,48,0.035);
-    --body-glow-1: rgba(58,90,120,0.08);
-    --body-glow-2: rgba(124,138,118,0.07);
+    --ink: #0f1424;
+    --ink-dim: #535b73;
+    --ink-mute: #7e8699;
+    --line: rgba(20,30,50,0.08);
+    --line-2: rgba(20,30,50,0.16);
+    --teal: #0fa899;
+    --blue: #3b6df0;
+    --green: #1f9c52;
+    --amber: #a87012;
+    --purple: #6d3df5;
+    --red: #d04545;
+    --trace: rgba(59,109,240,0.45);
+    --grid-line: rgba(20,30,50,0.045);
+    --body-glow-1: rgba(59,109,240,0.10);
+    --body-glow-2: rgba(15,168,153,0.08);
+    --topbar-bg: rgba(245,246,250,0.78);
+    --surface-translucent: rgba(255,255,255,0.72);
+    --on-accent: #ffffff; /* белый текст на акцентах в светлой теме */
 }
 
 * { box-sizing: border-box; }
@@ -174,7 +165,7 @@ main {
 }
 .btn-primary {
     background: var(--teal);
-    color: #072120;
+    color: var(--on-accent);
     box-shadow: 0 0 0 1px rgba(79,209,197,0.5), 0 10px 24px rgba(79,209,197,0.22);
     border: 0;
 }

@@ -5,11 +5,10 @@
     z-index: 50;
     backdrop-filter: blur(14px) saturate(140%);
     -webkit-backdrop-filter: blur(14px) saturate(140%);
-    background: rgba(11,15,23,0.72);
+    background: var(--topbar-bg);
     border-bottom: 1px solid var(--line);
     transition: background-color .3s ease, border-color .3s ease;
 }
-:root[data-theme="light"] .topbar { background: rgba(245,243,238,0.82); }
 
 /* ===== Кнопка переключения темы ===== */
 .theme-toggle {
@@ -123,7 +122,7 @@ nav.primary a.active svg, nav.primary .tab-link.active svg {
     border-radius: 8px;
     font-size: 13px;
     background: var(--teal);
-    color: #072120;
+    color: var(--on-accent);
     font-weight: 600;
     display: inline-flex;
     align-items: center;
