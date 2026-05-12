@@ -40,10 +40,10 @@
     <a-marker preset="hiro"
               smooth="true" smoothCount="5"
               smoothTolerance="0.01" smoothThreshold="2">
-        <!-- Маленький полупрозрачный куб как индикатор что маркер найден -->
-        <a-box position="0 0.3 0" scale="0.5 0.5 0.5"
+        <!-- Индикатор лежит ровно на маркере -->
+        <a-box position="0 0.05 0" scale="0.2 0.05 0.2"
                material="color: #4fd1c5; opacity: 0.5; transparent: true"
-               animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+               animation="property: rotation; to: 0 360 0; loop: true; dur: 6000"></a-box>
     </a-marker>
 
     <a-entity camera></a-entity>

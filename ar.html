@@ -89,23 +89,22 @@
     <a-marker preset="hiro"
               smooth="true" smoothCount="5"
               smoothTolerance="0.01" smoothThreshold="2">
-        <!-- Гарантированно видимый куб + надпись -->
-        <a-box position="0 0.5 0" scale="1 1 1"
-               material="color: #4fd1c5; opacity: 0.85; transparent: true"
-               animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
-        <a-text value="WORKING!" position="0 1.4 0" align="center" color="#fff" scale="1.5 1.5 1.5"></a-text>
+        <!-- Маленький индикатор НА маркере: куб лежит ровно на плоскости -->
+        <a-box position="0 0.05 0" scale="0.15 0.05 0.15"
+               material="color: #4fd1c5; opacity: 0.6; transparent: true"
+               animation="property: rotation; to: 0 360 0; loop: true; dur: 6000"></a-box>
 
-        <!-- Материнка / Процессор — переключаются кнопками -->
+        <!-- Материнка / Процессор — лежат плашмя на маркере, чуть приподняты -->
         <a-entity id="arMb"
                   gltf-model="assets/models/motherboard.glb"
-                  scale="0.4 0.4 0.4"
+                  scale="0.25 0.25 0.25"
                   rotation="-90 0 0"
-                  position="0 0 0"></a-entity>
+                  position="0 0.01 0"></a-entity>
         <a-entity id="arCpu"
                   gltf-model="assets/models/cpu.glb"
-                  scale="0.3 0.3 0.3"
+                  scale="0.2 0.2 0.2"
                   rotation="-90 0 0"
-                  position="0 0.1 0"
+                  position="0 0.01 0"
                   visible="false"></a-entity>
     </a-marker>
 
