@@ -1,4 +1,5 @@
 /* ===== ДИЗАЙН-СИСТЕМА ===== */
+/* По умолчанию — тёмная "AR-лаборатория" тема */
 :root {
     --bg: #0b0f17;
     --bg-2: #11161f;
@@ -16,6 +17,31 @@
     --purple: #a78bfa;
     --red: #ff6b6b;
     --trace: rgba(91,142,247,0.45);
+    --grid-line: rgba(140,170,210,0.05);
+    --body-glow-1: rgba(91,142,247,0.10);
+    --body-glow-2: rgba(79,209,197,0.07);
+}
+/* Светлая "учебная" тема (палитра из макета v2: бежевый фон + earth-акценты) */
+:root[data-theme="light"] {
+    --bg: #f5f3ee;
+    --bg-2: #ece8df;
+    --bg-3: #fbfaf6;
+    --panel: #ffffff;
+    --ink: #1d2230;
+    --ink-dim: #5a6275;
+    --ink-mute: #8a91a3;
+    --line: rgba(29,34,48,0.08);
+    --line-2: rgba(29,34,48,0.14);
+    --teal: #3a5a78;   /* slate-blue */
+    --blue: #4a6fa5;
+    --green: #7c8a76;  /* sage */
+    --amber: #b08968;  /* warm tan */
+    --purple: #8b7aa6; /* muted lavender */
+    --red: #c45c5c;
+    --trace: rgba(58,90,120,0.45);
+    --grid-line: rgba(29,34,48,0.035);
+    --body-glow-1: rgba(58,90,120,0.08);
+    --body-glow-2: rgba(124,138,118,0.07);
 }
 
 * { box-sizing: border-box; }
@@ -32,11 +58,12 @@ html, body {
 
 body {
     background:
-        radial-gradient(900px 600px at 85% -10%, rgba(91,142,247,0.10), transparent 60%),
-        radial-gradient(700px 500px at 8% 25%, rgba(79,209,197,0.07), transparent 60%),
+        radial-gradient(900px 600px at 85% -10%, var(--body-glow-1), transparent 60%),
+        radial-gradient(700px 500px at 8% 25%, var(--body-glow-2), transparent 60%),
         var(--bg);
     overflow-x: hidden;
     min-height: 100vh;
+    transition: background-color .3s ease, color .3s ease;
 }
 
 /* PCB-стиль фоновой сетки */
@@ -45,8 +72,8 @@ body::before {
     position: fixed;
     inset: 0;
     background-image:
-        linear-gradient(rgba(140,170,210,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(140,170,210,0.05) 1px, transparent 1px);
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size: 40px 40px;
     mask-image: radial-gradient(ellipse 100% 70% at 50% 20%, #000 25%, transparent 80%);
     pointer-events: none;

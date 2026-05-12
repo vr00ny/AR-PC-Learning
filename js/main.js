@@ -1,4 +1,18 @@
-// Главный скрипт: переключение вкладок, мобильное меню, анимации появления.
+// Главный скрипт: переключение вкладок, мобильное меню, анимации появления, переключение темы.
+
+// ===== Переключение темы (тёмная / светлая) =====
+// Применение из localStorage уже в <head>, тут только сама кнопка
+const themeBtn = document.getElementById('themeToggle');
+if (themeBtn) {
+    themeBtn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+        const next = current === 'light' ? 'dark' : 'light';
+        if (next === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        else document.documentElement.removeAttribute('data-theme');
+        try { localStorage.setItem('site-theme', next); } catch (e) {}
+    });
+}
+
 
 // ===== Переключение вкладок =====
 function openTabByName(tabName) {

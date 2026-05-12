@@ -17,6 +17,16 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
+    <!-- Применяем сохранённую тему ДО загрузки CSS — иначе будет вспышка тёмной темы -->
+    <script>
+        (function () {
+            try {
+                var t = localStorage.getItem('site-theme');
+                if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+            } catch (e) {}
+        })();
+    </script>
+
     <!-- Мобильная консоль (только если в URL ?debug=1) — для отладки на телефоне -->
     <script>
         if (location.search.indexOf('debug=1') !== -1) {
@@ -91,6 +101,16 @@
             </button>
         </nav>
 
+        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему" title="Светлая / тёмная тема">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+            </svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+        </button>
+
         <button class="top-cta" onclick="openTabByName('ar')">
             Начать
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -113,7 +133,7 @@
         <div class="reveal">
             <div class="hero-eyebrow">
                 <span class="pulse"></span>
-                AR · WebGL · v2026.05 · build POLISH
+                AR · WebGL · v2026.05 · build THEME-TOGGLE
             </div>
             <h1>
                 Открой системный блок,<br>
