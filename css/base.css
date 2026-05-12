@@ -36,19 +36,19 @@
     --ink-mute: #7e8699;
     --line: rgba(20,30,50,0.08);
     --line-2: rgba(20,30,50,0.16);
-    --teal: #0fa899;
-    --blue: #3b6df0;
-    --green: #1f9c52;
-    --amber: #a87012;
-    --purple: #6d3df5;
-    --red: #d04545;
-    --trace: rgba(59,109,240,0.45);
-    --grid-line: rgba(20,30,50,0.045);
-    --body-glow-1: rgba(59,109,240,0.10);
-    --body-glow-2: rgba(15,168,153,0.08);
+    --teal: #4d9389;     /* приглушённый сине-зелёный */
+    --blue: #5876b3;     /* приглушённый синий */
+    --green: #5a8b6a;    /* мягкий зелёный */
+    --amber: #b08249;    /* тёплый тан */
+    --purple: #7d6db0;   /* приглушённый сиреневый */
+    --red: #c46868;
+    --trace: rgba(88,118,179,0.35);
+    --grid-line: rgba(20,30,50,0.04);
+    --body-glow-1: rgba(88,118,179,0.05);
+    --body-glow-2: rgba(77,147,137,0.04);
     --topbar-bg: rgba(245,246,250,0.78);
     --surface-translucent: rgba(255,255,255,0.72);
-    --on-accent: #ffffff; /* белый текст на акцентах в светлой теме */
+    --on-accent: #ffffff;
 }
 
 * { box-sizing: border-box; }
