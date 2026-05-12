@@ -47,6 +47,11 @@ function destroyAssemblyAR() {
     ).forEach(el => { try { el.remove(); } catch (e) {} });
 
     if (typeof restoreGetUserMedia === 'function') restoreGetUserMedia();
+    // Сброс meta viewport / inline-стилей html и body — иначе после AR вёрстка
+    // "расширяется" как в горизонтальной ориентации
+    if (typeof restorePageLayout === 'function') restorePageLayout();
+    void document.body.offsetHeight;
+    window.dispatchEvent(new Event('resize'));
 
     const board = document.getElementById('assemblyBoard');
     if (board) board.classList.remove('ar-mode');
@@ -64,6 +69,7 @@ function createAssemblyAR() {
     // Если на AR-вкладке камера активна — выключить (одна камера не может быть в двух сессиях)
     if (typeof destroyARScene === 'function') destroyARScene();
     if (typeof forceBackCamera === 'function') forceBackCamera();
+    if (typeof snapshotPageLayout === 'function') snapshotPageLayout();
 
     const board = document.getElementById('assemblyBoard');
     const tray = document.getElementById('assemblyTray');

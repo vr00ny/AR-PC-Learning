@@ -6,6 +6,37 @@
 let currentARSession = null;
 let isCameraOn = false;
 let originalGetUserMedia = null;
+let savedViewport = null;
+
+// Снимаем meta viewport и inline-стили html/body до AR — A-Frame любит их менять
+function snapshotPageLayout() {
+    const meta = document.querySelector('meta[name="viewport"]');
+    savedViewport = {
+        viewport: meta ? meta.getAttribute('content') : null,
+        bodyStyle: document.body.getAttribute('style') || '',
+        htmlStyle: document.documentElement.getAttribute('style') || '',
+        bodyClasses: document.body.className,
+        htmlClasses: document.documentElement.className
+    };
+}
+
+// Возврат к исходному состоянию — фиксит "расширение" вёрстки после AR
+function restorePageLayout() {
+    if (!savedViewport) return;
+    const meta = document.querySelector('meta[name="viewport"]');
+    if (meta && savedViewport.viewport !== null) {
+        meta.setAttribute('content', savedViewport.viewport);
+    }
+    // Возврат classes — A-Frame любит навешивать a-fullscreen на html
+    document.body.className = savedViewport.bodyClasses;
+    document.documentElement.className = savedViewport.htmlClasses;
+    // Inline-стили
+    if (savedViewport.bodyStyle) document.body.setAttribute('style', savedViewport.bodyStyle);
+    else document.body.removeAttribute('style');
+    if (savedViewport.htmlStyle) document.documentElement.setAttribute('style', savedViewport.htmlStyle);
+    else document.documentElement.removeAttribute('style');
+    savedViewport = null;
+}
 
 function stopAllCameraStreams() {
     document.querySelectorAll('video').forEach(v => {
@@ -57,6 +88,12 @@ function destroyARScene() {
     ).forEach(el => { try { el.remove(); } catch (e) {} });
 
     restoreGetUserMedia();
+    // Возврат meta viewport, inline-стилей и классов html/body — фиксит "расширение" вёрстки
+    restorePageLayout();
+    // Принудительно пересчитать layout
+    void document.body.offsetHeight;
+    window.dispatchEvent(new Event('resize'));
+
     currentARSession = null;
     isCameraOn = false;
 }
@@ -65,6 +102,7 @@ function createARScene() {
     if (isCameraOn) return;
     destroyARScene();
     forceBackCamera();
+    snapshotPageLayout();
 
     // Overlay — fixed контейнер поверх всего сайта.
     // Сайт сам не меняется, мы просто кладём поверх него чёрный слой с AR.
