@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <title>AR</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <style>
+        html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #000; overflow: hidden; }
+        a-scene { display: block; width: 100% !important; height: 100% !important; }
+
+        .ar-info {
+            position: fixed; top: 14px; left: 14px;
+            background: rgba(11,15,23,0.85);
+            color: #e6ecf5;
+            padding: 6px 12px; border-radius: 6px;
+            border: 1px solid rgba(140,170,210,0.25);
+            font: 500 11px/1.2 "JetBrains Mono", monospace;
+            letter-spacing: .04em; z-index: 100;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+        }
+        .ar-exit-btn {
+            position: fixed;
+            top: calc(env(safe-area-inset-top, 0px) + 14px);
+            right: calc(env(safe-area-inset-right, 0px) + 14px);
+            z-index: 200;
+            width: 46px; height: 46px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.25);
+            background: rgba(11,15,23,0.78);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            color: #fff; font-size: 22px; font-weight: 500;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+        .ar-exit-btn:active { transform: scale(0.94); }
+        .marker-hint {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(11,15,23,0.85);
+            color: #4fd1c5;
+            padding: 10px 16px; border-radius: 10px;
+            border: 1px solid rgba(79,209,197,0.35);
+            font: 500 11px/1.4 "JetBrains Mono", monospace;
+            letter-spacing: .05em; z-index: 100;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            transition: opacity .3s;
+            text-align: center;
+        }
+        .marker-hint.hidden { opacity: 0; pointer-events: none; }
+        .ar-controls {
+            position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+            left: 50%; transform: translateX(-50%);
+            display: flex; gap: 6px;
+            background: rgba(11,15,23,0.85);
+            padding: 6px; border-radius: 28px;
+            border: 1px solid rgba(140,170,210,0.25);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+        .ar-controls button {
+            background: transparent; color: #e6ecf5;
+            border: 0; padding: 8px 16px; border-radius: 20px;
+            font: 600 12px/1 "Inter", system-ui, sans-serif;
+            cursor: pointer;
+        }
+        .ar-controls button.active { background: #4fd1c5; color: #072120; }
+
+        /* Принудительные стили для AR.js <video> чтобы влез в наш iframe */
+        body > video, body > #arjs-video {
+            position: absolute !important;
+            top: 0 !important; left: 0 !important;
+            width: 100% !important; height: 100% !important;
+            object-fit: cover !important;
+            z-index: 1 !important;
+        }
+    </style>
+</head>
+<body>
+
+<a-scene
+    embedded
+    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono; maxDetectionRate: 60; patternRatio: 0.5;"
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true; antialias: true; alpha: true;">
+
+    <a-marker preset="hiro"
+              smooth="true" smoothCount="5"
+              smoothTolerance="0.01" smoothThreshold="2">
+        <!-- Гарантированно видимый куб + надпись -->
+        <a-box position="0 0.5 0" scale="1 1 1"
+               material="color: #4fd1c5; opacity: 0.85; transparent: true"
+               animation="property: rotation; to: 0 360 0; loop: true; dur: 4000"></a-box>
+        <a-text value="WORKING!" position="0 1.4 0" align="center" color="#fff" scale="1.5 1.5 1.5"></a-text>
+
+        <!-- Материнка / Процессор — переключаются кнопками -->
+        <a-entity id="arMb"
+                  gltf-model="assets/models/motherboard.glb"
+                  scale="0.4 0.4 0.4"
+                  rotation="-90 0 0"
+                  position="0 0 0"></a-entity>
+        <a-entity id="arCpu"
+                  gltf-model="assets/models/cpu.glb"
+                  scale="0.3 0.3 0.3"
+                  rotation="-90 0 0"
+                  position="0 0.1 0"
+                  visible="false"></a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+</a-scene>
+
+<div class="ar-info" id="arInfo">// SEARCHING…</div>
+<div class="marker-hint" id="markerHint">🎯 Наведи камеру на маркер Hiro</div>
+
+<button class="ar-exit-btn" id="exitBtn" aria-label="Выйти">✕</button>
+
+<div class="ar-controls">
+    <button id="btnMb" class="active">🔧 Мат. плата</button>
+    <button id="btnCpu">⚙️ Процессор</button>
+</div>
+
+<script>
+// Принудительно задняя камера (иначе iPhone Safari открывает селфи)
+(function () {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    const orig = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function (constraints) {
+        const c = constraints || {};
+        if (c.video) {
+            const v = typeof c.video === 'object' ? Object.assign({}, c.video) : {};
+            v.facingMode = { ideal: 'environment' };
+            c.video = v;
+        }
+        return orig(c);
+    };
+})();
+
+// iOS Safari: video AR.js нужно playsinline + muted
+new MutationObserver(function () {
+    const v = document.getElementById('arjs-video');
+    if (!v) return;
+    v.setAttribute('playsinline', '');
+    v.setAttribute('webkit-playsinline', '');
+    v.muted = true;
+    v.playsInline = true;
+    try { v.play && v.play().catch(function(){}); } catch (e) {}
+}).observe(document.body, { childList: true, subtree: false });
+
+const info = document.getElementById('arInfo');
+const hint = document.getElementById('markerHint');
+const marker = document.querySelector('a-marker');
+marker.addEventListener('markerFound', function () {
+    info.textContent = '// MARKER · LOCKED';
+    hint.classList.add('hidden');
+});
+marker.addEventListener('markerLost', function () {
+    info.textContent = '// SEARCHING…';
+    hint.classList.remove('hidden');
+});
+
+// Переключение моделей
+const btnMb = document.getElementById('btnMb');
+const btnCpu = document.getElementById('btnCpu');
+const elMb = document.getElementById('arMb');
+const elCpu = document.getElementById('arCpu');
+btnMb.onclick = function () {
+    elMb.setAttribute('visible', 'true');
+    elCpu.setAttribute('visible', 'false');
+    btnMb.classList.add('active');
+    btnCpu.classList.remove('active');
+};
+btnCpu.onclick = function () {
+    elMb.setAttribute('visible', 'false');
+    elCpu.setAttribute('visible', 'true');
+    btnCpu.classList.add('active');
+    btnMb.classList.remove('active');
+};
+
+// Выход — постим сообщение родительскому окну, оно удалит iframe
+document.getElementById('exitBtn').onclick = function () {
+    try { parent.postMessage({ type: 'ar-close' }, '*'); } catch (e) {}
+};
+
+// Если страница закрывается напрямую — гасим камеру
+window.addEventListener('beforeunload', function () {
+    document.querySelectorAll('video').forEach(function (v) {
+        const s = v.srcObject;
+        if (s && s.getTracks) s.getTracks().forEach(function (t) { try { t.stop(); } catch (e) {} });
+    });
+});
+</script>
+
+</body>
+</html>
