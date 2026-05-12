@@ -110,6 +110,37 @@ function destroyARScene() {
     // Восстанавливаем оригинальный getUserMedia
     restoreGetUserMedia();
 
+    // Удалить любые <style> и <script> которые A-Frame инжектил в head — иногда они
+    // оставляют артефакты на iOS Safari (resize-listeners, viewport overrides)
+    document.querySelectorAll('head style[data-href*="aframe"], style[data-injected]').forEach(s => s.remove());
+
+    // Принудительная зачистка inline-стилей body/html — если что-то застряло
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('margin');
+    document.body.style.removeProperty('padding');
+    document.body.style.removeProperty('position');
+    document.documentElement.style.removeProperty('overflow');
+    document.documentElement.style.removeProperty('margin');
+    document.documentElement.style.removeProperty('padding');
+
+    // Подстраховка: ещё раз убираем классы (вдруг где-то race условие)
+    document.body.classList.remove('ar-active', 'ar-fullscreen');
+    document.documentElement.classList.remove('ar-active');
+
+    // Force reflow — заставляем браузер пересчитать layout
+    void document.body.offsetHeight;
+
+    // На iOS Safari вёрстка иногда "залипает" после выхода из fullscreen-видео.
+    // Двойной rAF + resize-event заставляет браузер полностью пересобрать страницу.
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            window.dispatchEvent(new Event('resize'));
+            window.scrollTo(0, 0);
+            // Ещё раз — на случай если за это время что-то добавилось
+            document.body.classList.remove('ar-active', 'ar-fullscreen');
+        });
+    });
+
     // Убрать кнопку выхода
     const exitBtn = document.getElementById('arExitBtn');
     if (exitBtn) exitBtn.remove();
@@ -229,21 +260,48 @@ function createARScene() {
         }
     });
 
+    // Контейнер материнки — поворачиваем плашмя на маркер и приподнимаем,
+    // чтобы glb (Y-up) лёг параллельно маркеру и не уходил "под пол"
     const modelMb = document.createElement('a-entity');
     modelMb.setAttribute('id', 'arMb');
     modelMb.setAttribute('gltf-model', 'assets/models/motherboard.glb');
-    modelMb.setAttribute('scale', '0.5 0.5 0.5');
+    modelMb.setAttribute('scale', '0.35 0.35 0.35');
+    modelMb.setAttribute('position', '0 0.05 0');
+    modelMb.setAttribute('rotation', '-90 0 0');
     modelMb.setAttribute('visible', 'true');
 
     const modelCpu = document.createElement('a-entity');
     modelCpu.setAttribute('id', 'arCpu');
     modelCpu.setAttribute('gltf-model', 'assets/models/cpu.glb');
-    modelCpu.setAttribute('scale', '0.4 0.4 0.4');
-    modelCpu.setAttribute('position', '0 0.3 0');
+    modelCpu.setAttribute('scale', '0.3 0.3 0.3');
+    modelCpu.setAttribute('position', '0 0.1 0');
+    modelCpu.setAttribute('rotation', '-90 0 0');
     modelCpu.setAttribute('visible', 'false');
+
+    // Резервный куб — если glb не загрузится, хотя бы будет видно что трекинг работает
+    const fallbackBox = document.createElement('a-box');
+    fallbackBox.setAttribute('id', 'arFallback');
+    fallbackBox.setAttribute('position', '0 0.5 0');
+    fallbackBox.setAttribute('scale', '0.3 0.3 0.3');
+    fallbackBox.setAttribute('material', 'color: #4fd1c5; opacity: 0.4; transparent: true');
+    fallbackBox.setAttribute('animation', 'property: rotation; to: 0 360 0; loop: true; dur: 4000');
+    fallbackBox.setAttribute('visible', 'false');
+
+    // Если glb материнки не загрузится за 5 секунд — показываем fallback-куб
+    modelMb.addEventListener('model-loaded', () => {
+        const info = document.getElementById('arInfoLabel');
+        if (info) info.innerHTML = '// MODEL · READY';
+    });
+    modelMb.addEventListener('model-error', (e) => {
+        console.warn('AR model error:', e);
+        fallbackBox.setAttribute('visible', 'true');
+        const info = document.getElementById('arInfoLabel');
+        if (info) info.innerHTML = '// MODEL · ERROR (fallback)';
+    });
 
     marker.appendChild(modelMb);
     marker.appendChild(modelCpu);
+    marker.appendChild(fallbackBox);
     scene.appendChild(marker);
 
     const camera = document.createElement('a-entity');

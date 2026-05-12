@@ -52,40 +52,71 @@
     line-height: 1.1;
 }
 
-/* Материнская плата */
+/* Доска = открытый корпус ПК (вид сбоку). Двойная рамка имитирует стенки корпуса. */
 .assembly-board {
     position: relative;
     width: 100%;
     aspect-ratio: 4 / 3;
     margin-top: 16px;
     background:
-        repeating-linear-gradient(0deg, rgba(79,209,197,0.04) 0, rgba(79,209,197,0.04) 1px, transparent 1px, transparent 20px),
-        repeating-linear-gradient(90deg, rgba(79,209,197,0.04) 0, rgba(79,209,197,0.04) 1px, transparent 1px, transparent 20px),
-        linear-gradient(135deg, #0d2627 0%, #062814 100%);
-    border-radius: 14px;
+        repeating-linear-gradient(0deg, rgba(140,170,210,0.04) 0, rgba(140,170,210,0.04) 1px, transparent 1px, transparent 24px),
+        repeating-linear-gradient(90deg, rgba(140,170,210,0.04) 0, rgba(140,170,210,0.04) 1px, transparent 1px, transparent 24px),
+        linear-gradient(135deg, #131a25 0%, #0c1219 100%);
+    border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.03), 0 0 60px rgba(79,209,197,0.06);
-    border: 1px solid rgba(79,209,197,0.20);
+    box-shadow:
+        0 30px 80px rgba(0,0,0,0.55),
+        inset 0 0 0 1px rgba(255,255,255,0.03),
+        inset 0 0 0 4px #0c1219,
+        inset 0 0 0 6px rgba(140,170,210,0.18),
+        0 0 60px rgba(79,209,197,0.05);
+    border: 1px solid rgba(140,170,210,0.20);
+}
+/* Метка-наклейка "PC CASE / ATX" в углу для атмосферы */
+.assembly-board::before {
+    content: "PC CASE · ATX";
+    position: absolute;
+    top: 10px; left: 12px;
+    font-family: "JetBrains Mono";
+    font-size: 10px;
+    color: rgba(79,209,197,0.55);
+    letter-spacing: 0.15em;
+    z-index: 1;
+    pointer-events: none;
+}
+.assembly-board::after {
+    content: "▒▒▒ PSU AIR ▒▒▒";
+    position: absolute;
+    bottom: 10px; right: 12px;
+    font-family: "JetBrains Mono";
+    font-size: 9px;
+    color: rgba(140,170,210,0.25);
+    letter-spacing: 0.2em;
+    z-index: 1;
+    pointer-events: none;
 }
 
 .assembly-slot {
     position: absolute;
-    border: 2px dashed rgba(79,209,197,0.3);
-    border-radius: 6px;
-    background: rgba(11,15,23,0.4);
+    border: 2px dashed rgba(140,170,210,0.35);
+    border-radius: 8px;
+    background:
+        repeating-linear-gradient(45deg, rgba(140,170,210,0.04) 0 4px, transparent 4px 8px),
+        rgba(11,15,23,0.55);
     display: flex;
     align-items: center;
     justify-content: center;
     font-family: "JetBrains Mono";
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 500;
-    color: rgba(230,236,245,0.55);
+    color: rgba(230,236,245,0.65);
     text-align: center;
-    padding: 2px;
-    transition: border-color .15s, background .15s, color .15s;
+    padding: 4px 6px;
+    transition: border-color .15s, background .15s, color .15s, box-shadow .15s;
     user-select: none;
     letter-spacing: 0.05em;
     text-transform: uppercase;
+    z-index: 2;
 }
 .assembly-slot.highlight {
     border-color: var(--amber);
