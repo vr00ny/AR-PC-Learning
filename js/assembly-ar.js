@@ -56,6 +56,7 @@ function destroyAssemblyAR() {
         document.body.classList.remove('ar-active');
         document.documentElement.classList.remove('ar-active');
     }
+    if (typeof restoreGetUserMedia === 'function') restoreGetUserMedia();
 
     // Восстановить стили body/html
     if (assemblyArBodyStyle !== null) {
@@ -86,18 +87,34 @@ function createAssemblyAR() {
     const board = document.getElementById('assemblyBoard');
     if (!layer || !board) return;
 
+    // Принудительно задняя камера (функция из ar-scene.js)
+    if (typeof forceBackCamera === 'function') forceBackCamera();
+
     assemblyArBodyStyle = document.body.getAttribute('style') || '';
     assemblyArHtmlStyle = document.documentElement.getAttribute('style') || '';
     assemblyArBodyChildren = new Set(Array.from(document.body.children));
 
     const scene = document.createElement('a-scene');
     scene.setAttribute('embedded', '');
-    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix;');
+    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono; maxDetectionRate: 60; patternRatio: 0.5;');
     scene.setAttribute('vr-mode-ui', 'enabled: false');
-    scene.setAttribute('renderer', 'logarithmicDepthBuffer: true;');
+    scene.setAttribute('renderer', 'logarithmicDepthBuffer: true; antialias: true;');
 
     const marker = document.createElement('a-marker');
     marker.setAttribute('preset', 'hiro');
+    marker.setAttribute('smooth', 'true');
+    marker.setAttribute('smoothCount', '5');
+    marker.setAttribute('smoothTolerance', '0.01');
+    marker.setAttribute('smoothThreshold', '2');
+
+    marker.addEventListener('markerFound', () => {
+        const hint = document.getElementById('assemblyArHint');
+        if (hint) hint.innerHTML = '🎯 Маркер найден — материнка появится на нём.';
+    });
+    marker.addEventListener('markerLost', () => {
+        const hint = document.getElementById('assemblyArHint');
+        if (hint) hint.innerHTML = '🔍 Ищу маркер… наведи камеру на Hiro.';
+    });
 
     const mb = document.createElement('a-entity');
     mb.setAttribute('gltf-model', 'assets/models/motherboard.glb');

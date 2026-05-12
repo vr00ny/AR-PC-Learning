@@ -14,9 +14,33 @@ let isCameraOn = false;
 let savedBodyStyle = null;
 let savedHtmlStyle = null;
 let videoParkObserver = null;
+let originalGetUserMedia = null;
 
 // Снимок элементов body ДО запуска AR — чтобы после удалить только то, что AR.js добавил
 let bodyChildrenSnapshot = null;
+
+// Принудительный выбор задней камеры — AR.js не делает этого сам, и iPhone Safari
+// часто открывает переднюю (селфи) камеру, где маркер зеркальный и не распознаётся.
+function forceBackCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+    if (originalGetUserMedia) return; // уже подменено
+    originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = function(constraints) {
+        const c = constraints || {};
+        if (c.video) {
+            const v = typeof c.video === 'object' ? Object.assign({}, c.video) : {};
+            v.facingMode = { ideal: 'environment' };
+            c.video = v;
+        }
+        return originalGetUserMedia(c);
+    };
+}
+function restoreGetUserMedia() {
+    if (originalGetUserMedia && navigator.mediaDevices) {
+        navigator.mediaDevices.getUserMedia = originalGetUserMedia;
+        originalGetUserMedia = null;
+    }
+}
 
 function stopAllCameraStreams() {
     // Остановить треки у всех video на странице (AR.js может оставить видимый или скрытый)
@@ -82,6 +106,9 @@ function destroyARScene() {
     document.body.classList.remove('ar-active');
     document.documentElement.classList.remove('ar-active');
     document.body.classList.remove('ar-fullscreen');
+
+    // Восстанавливаем оригинальный getUserMedia
+    restoreGetUserMedia();
 
     // Убрать кнопку выхода
     const exitBtn = document.getElementById('arExitBtn');
@@ -157,6 +184,9 @@ function createARScene() {
     const container = document.getElementById('arContainer');
     if (!container) return;
 
+    // Принудительно задняя камера на iPhone
+    forceBackCamera();
+
     // Запоминаем исходные inline-стили body/html и набор детей body
     savedBodyStyle = document.body.getAttribute('style') || '';
     savedHtmlStyle = document.documentElement.getAttribute('style') || '';
@@ -164,13 +194,40 @@ function createARScene() {
 
     const scene = document.createElement('a-scene');
     scene.setAttribute('embedded', '');
-    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix;');
+    // detectionMode: mono — для preset 'hiro' (matrix мешает pattern-распознаванию)
+    // maxDetectionRate: 60 — чаще проверять кадры
+    // patternRatio: 0.5 — стандартное соотношение для Hiro-маркера
+    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono; maxDetectionRate: 60; patternRatio: 0.5;');
     scene.setAttribute('vr-mode-ui', 'enabled: false');
-    scene.setAttribute('renderer', 'logarithmicDepthBuffer: true;');
+    scene.setAttribute('renderer', 'logarithmicDepthBuffer: true; antialias: true;');
     scene.style.cssText = 'width:100%!important;height:100%!important;position:absolute!important;top:0!important;left:0!important;';
 
     const marker = document.createElement('a-marker');
     marker.setAttribute('preset', 'hiro');
+    marker.setAttribute('smooth', 'true');
+    marker.setAttribute('smoothCount', '5');
+    marker.setAttribute('smoothTolerance', '0.01');
+    marker.setAttribute('smoothThreshold', '2');
+    marker.setAttribute('raycaster', 'objects: .clickable');
+    marker.setAttribute('emitevents', 'true');
+    marker.setAttribute('cursor', 'fuse: false; rayOrigin: mouse;');
+
+    // События маркера — обновляем индикатор статуса
+    marker.addEventListener('markerFound', () => {
+        const info = document.getElementById('arInfoLabel');
+        if (info) info.innerHTML = '// MARKER · LOCKED';
+        const hint = document.getElementById('markerHint');
+        if (hint) hint.style.opacity = '0';
+    });
+    marker.addEventListener('markerLost', () => {
+        const info = document.getElementById('arInfoLabel');
+        if (info) info.innerHTML = '// SEARCHING…';
+        const hint = document.getElementById('markerHint');
+        if (hint) {
+            hint.innerHTML = '🎯 Наведи на маркер Hiro';
+            hint.style.opacity = '1';
+        }
+    });
 
     const modelMb = document.createElement('a-entity');
     modelMb.setAttribute('id', 'arMb');
