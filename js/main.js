@@ -13,6 +13,8 @@ function openTabByName(tabName) {
 
     // Закрываем AR-камеру при уходе с вкладки AR
     if (tabName !== 'ar' && typeof destroyARScene === 'function') destroyARScene();
+    // Закрываем AR-фон сборки при уходе с вкладки Сборка
+    if (tabName !== 'assembly' && typeof destroyAssemblyAR === 'function') destroyAssemblyAR();
 
     // Закрываем мобильное меню
     const topbar = document.querySelector('.topbar');

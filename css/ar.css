@@ -41,6 +41,26 @@
 }
 a-scene:not(.ar-container a-scene) { display: none !important; }
 
+/* Видео AR.js должно жить только внутри контейнера — иначе оно растягивается на весь экран */
+.ar-container video,
+.ar-container #arjs-video {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    z-index: 1 !important;
+}
+/* Любое видео AR.js, оставшееся вне нашего контейнера — скрыть */
+body > video#arjs-video,
+body > video[id^="arjs"] { display: none !important; }
+/* Запас прочности: канвасы A-Frame / AR.js, если оторвутся в body */
+body > canvas.a-canvas { display: none !important; }
+
 .ar-controls {
     position: absolute;
     bottom: 14px;

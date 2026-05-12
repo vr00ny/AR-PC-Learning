@@ -1,27 +1,113 @@
 // AR-сцена на A-Frame + AR.js.
 // Создаёт сцену с маркером Hiro и двумя GLTF-моделями (мат. плата / процессор).
-// Сцена пересоздаётся при включении камеры и полностью удаляется при выключении.
+//
+// Главная проблема AR.js: при запуске библиотека добавляет <video id="arjs-video">
+// прямо в <body>, растягивает его на весь экран и меняет стили body/html.
+// После выключения камеры этот мусор остаётся — поэтому здесь мы:
+//   1) запоминаем исходные inline-стили body/html ДО включения
+//   2) перемещаем video AR.js внутрь нашего контейнера и фиксируем его размеры
+//   3) при выключении останавливаем все MediaStream-треки (гасим лампочку камеры)
+//   4) удаляем добавленные AR.js элементы и возвращаем стили обратно
 
 let currentScene = null;
 let isCameraOn = false;
+let savedBodyStyle = null;
+let savedHtmlStyle = null;
+let videoParkInterval = null;
+
+// Снимок элементов body ДО запуска AR — чтобы после удалить только то, что AR.js добавил
+let bodyChildrenSnapshot = null;
+
+function stopAllCameraStreams() {
+    // Остановить треки у всех video на странице (AR.js может оставить видимый или скрытый)
+    document.querySelectorAll('video').forEach(v => {
+        const stream = v.srcObject;
+        if (stream && typeof stream.getTracks === 'function') {
+            stream.getTracks().forEach(t => {
+                try { t.stop(); } catch (e) { /* ignore */ }
+            });
+            v.srcObject = null;
+        }
+        try { v.pause(); } catch (e) { /* ignore */ }
+    });
+}
 
 function destroyARScene() {
+    // Перестать следить за видео-элементом
+    if (videoParkInterval) {
+        clearInterval(videoParkInterval);
+        videoParkInterval = null;
+    }
+
+    // 1) Гасим камеру — иначе индикатор в браузере останется гореть
+    stopAllCameraStreams();
+
+    // 2) Удаляем элементы, которые AR.js / A-Frame добавили в body
+    //    (всё, что не было в body до запуска камеры)
+    if (bodyChildrenSnapshot) {
+        Array.from(document.body.children).forEach(node => {
+            if (!bodyChildrenSnapshot.has(node)) {
+                try { node.remove(); } catch (e) { /* ignore */ }
+            }
+        });
+        bodyChildrenSnapshot = null;
+    }
+    // На всякий случай — явная зачистка известных id AR.js
+    document.querySelectorAll('#arjs-video, video#arjs-video').forEach(v => v.remove());
+
+    // 3) Удаляем нашу сцену из контейнера
+    const container = document.getElementById('arContainer');
     if (currentScene && currentScene.parentNode) {
         currentScene.parentNode.removeChild(currentScene);
-        currentScene = null;
     }
-    const container = document.getElementById('arContainer');
-    const existingScene = container.querySelector('a-scene');
-    if (existingScene) existingScene.remove();
+    currentScene = null;
+    if (container) {
+        container.querySelectorAll('a-scene').forEach(s => s.remove());
+        const dynamicControls = container.querySelector('.ar-controls');
+        if (dynamicControls) dynamicControls.remove();
+    }
 
-    // Удаляем динамически созданные кнопки управления моделями
-    const dynamicControls = container.querySelector('.ar-controls');
-    if (dynamicControls) dynamicControls.remove();
+    // 4) Возвращаем исходные inline-стили body и html
+    if (savedBodyStyle !== null) {
+        document.body.setAttribute('style', savedBodyStyle);
+        if (!savedBodyStyle) document.body.removeAttribute('style');
+        savedBodyStyle = null;
+    }
+    if (savedHtmlStyle !== null) {
+        document.documentElement.setAttribute('style', savedHtmlStyle);
+        if (!savedHtmlStyle) document.documentElement.removeAttribute('style');
+        savedHtmlStyle = null;
+    }
 
     isCameraOn = false;
-    document.getElementById('arInfoLabel').innerHTML = '// CAMERA OFF';
-    document.getElementById('markerHint').innerHTML = '📸 Нажми «Включить камеру»';
-    document.getElementById('markerHint').style.opacity = '1';
+    const info = document.getElementById('arInfoLabel');
+    const hint = document.getElementById('markerHint');
+    if (info) info.innerHTML = '// CAMERA OFF';
+    if (hint) {
+        hint.innerHTML = '📸 Нажми «Включить камеру»';
+        hint.style.opacity = '1';
+    }
+}
+
+function parkArjsVideo(container) {
+    // AR.js помещает <video id="arjs-video"> в body и растягивает на весь экран.
+    // Мы насильно перемещаем его в наш контейнер и переопределяем стили,
+    // чтобы видео жило только внутри рамки AR-вкладки.
+    const video = document.getElementById('arjs-video');
+    if (!video) return false;
+
+    if (video.parentNode !== container) {
+        container.appendChild(video);
+    }
+    video.style.cssText =
+        'position:absolute!important;' +
+        'top:0!important;left:0!important;' +
+        'width:100%!important;height:100%!important;' +
+        'object-fit:cover!important;' +
+        'z-index:1!important;' +
+        'margin:0!important;padding:0!important;' +
+        'transform:none!important;';
+    return true;
 }
 
 function createARScene() {
@@ -29,24 +115,29 @@ function createARScene() {
     destroyARScene();
 
     const container = document.getElementById('arContainer');
+    if (!container) return;
+
+    // Запоминаем исходные inline-стили body/html и набор детей body
+    savedBodyStyle = document.body.getAttribute('style') || '';
+    savedHtmlStyle = document.documentElement.getAttribute('style') || '';
+    bodyChildrenSnapshot = new Set(Array.from(document.body.children));
 
     const scene = document.createElement('a-scene');
     scene.setAttribute('embedded', '');
-    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false;');
+    scene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix;');
     scene.setAttribute('vr-mode-ui', 'enabled: false');
-    scene.style.cssText = 'width:100% !important; height:100% !important; position:absolute !important; top:0 !important; left:0 !important;';
+    scene.setAttribute('renderer', 'logarithmicDepthBuffer: true;');
+    scene.style.cssText = 'width:100%!important;height:100%!important;position:absolute!important;top:0!important;left:0!important;';
 
     const marker = document.createElement('a-marker');
     marker.setAttribute('preset', 'hiro');
 
-    // Модель материнской платы (временно — DamagedHelmet из Khronos)
     const modelMb = document.createElement('a-entity');
     modelMb.setAttribute('id', 'arMb');
     modelMb.setAttribute('gltf-model', 'assets/models/motherboard.glb');
     modelMb.setAttribute('scale', '0.5 0.5 0.5');
     modelMb.setAttribute('visible', 'true');
 
-    // Модель процессора (временно — MetalRoughSpheres)
     const modelCpu = document.createElement('a-entity');
     modelCpu.setAttribute('id', 'arCpu');
     modelCpu.setAttribute('gltf-model', 'assets/models/cpu.glb');
@@ -66,7 +157,23 @@ function createARScene() {
     currentScene = scene;
     isCameraOn = true;
 
-    // Кнопки переключения моделей появляются только при активной камере
+    // AR.js создаёт <video> асинхронно, после getUserMedia.
+    // Раз в 150 мс проверяем — как только появился, паркуем в контейнер.
+    videoParkInterval = setInterval(() => {
+        if (parkArjsVideo(container)) {
+            clearInterval(videoParkInterval);
+            videoParkInterval = null;
+        }
+    }, 150);
+    // Подстраховка — если что-то пойдёт не так, перестанем спамить через 10с
+    setTimeout(() => {
+        if (videoParkInterval) {
+            clearInterval(videoParkInterval);
+            videoParkInterval = null;
+        }
+    }, 10000);
+
+    // Кнопки переключения моделей
     const controlsDiv = document.createElement('div');
     controlsDiv.className = 'ar-controls';
     controlsDiv.innerHTML = '<button id="dynamicBtnMb">🔧 Мат. плата</button><button id="dynamicBtnCpu">⚙️ Процессор</button>';
@@ -98,3 +205,9 @@ function createARScene() {
         if (hint) hint.style.opacity = '0';
     }, 5000);
 }
+
+// На случай если пользователь закроет вкладку браузера с активной камерой —
+// явно отключаем поток (некоторые мобильные браузеры иначе оставляют его жить).
+window.addEventListener('beforeunload', () => {
+    if (isCameraOn) stopAllCameraStreams();
+});

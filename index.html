@@ -479,7 +479,20 @@
             </div>
         </div>
 
-        <div class="assembly-board" id="assemblyBoard"></div>
+        <div class="assembly-mode">
+            <button class="assembly-ar-toggle" id="assemblyArToggle" onclick="toggleAssemblyAR()">
+                <span class="dot"></span>
+                <span class="lbl-off">📷 Включить AR-фон</span>
+                <span class="lbl-on">🛑 Выключить AR-фон</span>
+            </button>
+            <div class="assembly-ar-hint" id="assemblyArHint">
+                После включения наведи камеру на маркер Hiro — он станет фоном под доской сборки.
+            </div>
+        </div>
+
+        <div class="assembly-board" id="assemblyBoard">
+            <div class="assembly-ar-layer" id="assemblyArLayer"></div>
+        </div>
 
         <div class="assembly-tray-title">Компоненты для установки</div>
         <div class="assembly-tray" id="assemblyTray"></div>
@@ -592,6 +605,7 @@
 <script src="js/viewer3d.js"></script>
 <script src="js/ar-scene.js"></script>
 <script src="js/assembly.js"></script>
+<script src="js/assembly-ar.js"></script>
 <script src="js/main.js"></script>
 
 </body>

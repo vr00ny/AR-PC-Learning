@@ -249,3 +249,119 @@
     .stat-card:nth-last-child(-n+1) { border-bottom: 0; }
     .stat-value { font-size: 18px; }
 }
+
+/* ===== AR-режим сборки ===== */
+.assembly-mode {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+.assembly-ar-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 25px;
+    border: 1px solid var(--line-2);
+    background: var(--bg-2);
+    color: var(--ink);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, color .2s, border-color .2s;
+    white-space: nowrap;
+}
+.assembly-ar-toggle:hover {
+    background: var(--bg-3);
+    border-color: var(--teal);
+    color: var(--teal);
+}
+.assembly-ar-toggle .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--ink-mute);
+    box-shadow: 0 0 0 0 rgba(79,209,197,0);
+    transition: background .2s, box-shadow .2s;
+}
+.assembly-ar-toggle .lbl-on { display: none; }
+.assembly-ar-toggle.active {
+    background: rgba(79,209,197,0.12);
+    border-color: var(--teal);
+    color: var(--teal);
+}
+.assembly-ar-toggle.active .dot {
+    background: var(--teal);
+    box-shadow: 0 0 0 4px rgba(79,209,197,0.18);
+    animation: arPulse 1.4s ease-in-out infinite;
+}
+.assembly-ar-toggle.active .lbl-off { display: none; }
+.assembly-ar-toggle.active .lbl-on { display: inline; }
+@keyframes arPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(79,209,197,0.18); }
+    50%      { box-shadow: 0 0 0 8px rgba(79,209,197,0); }
+}
+.assembly-ar-hint {
+    font-family: "JetBrains Mono";
+    font-size: 11px;
+    color: var(--ink-mute);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+}
+
+/* Слой AR-сцены под доской — изначально скрыт */
+.assembly-ar-layer {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: none;
+    overflow: hidden;
+    border-radius: inherit;
+    background: #000;
+}
+.assembly-board.ar-mode .assembly-ar-layer { display: block; }
+
+/* Видео AR.js внутри слоя занимает весь слой */
+.assembly-ar-layer video,
+.assembly-ar-layer #arjs-video {
+    position: absolute !important;
+    top: 0 !important; left: 0 !important;
+    width: 100% !important; height: 100% !important;
+    object-fit: cover !important;
+    margin: 0 !important; padding: 0 !important;
+    transform: none !important;
+    z-index: 1 !important;
+}
+.assembly-ar-layer a-scene {
+    width: 100% !important; height: 100% !important;
+    position: absolute !important;
+    top: 0 !important; left: 0 !important;
+}
+
+/* В AR-режиме доска становится прозрачнее, слоты — более читаемыми поверх видео */
+.assembly-board.ar-mode {
+    background: rgba(0,0,0,0.15);
+    border-color: rgba(79,209,197,0.5);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5),
+                inset 0 0 0 1px rgba(79,209,197,0.1),
+                0 0 80px rgba(79,209,197,0.15);
+}
+.assembly-board.ar-mode .assembly-slot {
+    background: rgba(11,15,23,0.78);
+    border-color: rgba(79,209,197,0.6);
+    color: rgba(230,236,245,0.85);
+    z-index: 2;
+}
+.assembly-board.ar-mode .assembly-slot.highlight {
+    background: rgba(232,182,90,0.7);
+    color: #1a1306;
+}
+.assembly-board.ar-mode .assembly-slot.filled {
+    background: rgba(124,217,146,0.78);
+    color: #062110;
+}
