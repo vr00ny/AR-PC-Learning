@@ -52,11 +52,28 @@ function destroyAssemblyAR() {
     // Класс на body/html снимаем только если AR-вкладка тоже не активна.
     const board = document.getElementById('assemblyBoard');
     if (board) board.classList.remove('ar-mode');
+    document.body.classList.remove('assembly-ar-fullscreen');
     if (!isCameraOn) {
         document.body.classList.remove('ar-active');
         document.documentElement.classList.remove('ar-active');
     }
     if (typeof restoreGetUserMedia === 'function') restoreGetUserMedia();
+
+    // Убрать кнопку выхода
+    const exitBtn = document.getElementById('assemblyArExitBtn');
+    if (exitBtn) exitBtn.remove();
+
+    // Принудительный reflow, как в AR-вкладке — иначе iOS Safari оставляет "половинчатый" сайт
+    document.body.style.removeProperty('overflow');
+    document.documentElement.style.removeProperty('overflow');
+    void document.body.offsetHeight;
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            window.dispatchEvent(new Event('resize'));
+            window.scrollTo(0, 0);
+            document.body.classList.remove('assembly-ar-fullscreen', 'ar-active');
+        });
+    });
 
     // Восстановить стили body/html
     if (assemblyArBodyStyle !== null) {
@@ -131,10 +148,23 @@ function createAssemblyAR() {
     layer.appendChild(scene);
     assemblyArScene = scene;
 
-    // Активируем AR-режим доски + защитный класс на body/html
+    // Активируем AR-режим доски + защитный класс на body/html + fullscreen
     board.classList.add('ar-mode');
     document.body.classList.add('ar-active');
     document.documentElement.classList.add('ar-active');
+    document.body.classList.add('assembly-ar-fullscreen');
+
+    // Кнопка выхода ✕
+    let exitBtn = document.getElementById('assemblyArExitBtn');
+    if (!exitBtn) {
+        exitBtn = document.createElement('button');
+        exitBtn.id = 'assemblyArExitBtn';
+        exitBtn.className = 'assembly-ar-exit-btn';
+        exitBtn.setAttribute('aria-label', 'Выйти из AR-сборки');
+        exitBtn.innerHTML = '✕';
+        exitBtn.onclick = () => destroyAssemblyAR();
+        document.body.appendChild(exitBtn);
+    }
 
     // MutationObserver: ловим появление video AR.js и сразу паркуем в слой
     const parkInto = (target) => {

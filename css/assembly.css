@@ -396,3 +396,117 @@
     background: rgba(124,217,146,0.78);
     color: #062110;
 }
+
+/* ===== Fullscreen-режим AR-сборки ===== */
+/* По аналогии с AR-вкладкой — при включении AR-фона на сборке прячем сайт
+   и разворачиваем доску с лотком на весь экран. iOS Safari иначе не даёт
+   камере жить в маленькой рамке. */
+body.assembly-ar-fullscreen { overflow: hidden !important; }
+body.assembly-ar-fullscreen > .topbar,
+body.assembly-ar-fullscreen > footer,
+body.assembly-ar-fullscreen #home,
+body.assembly-ar-fullscreen #components,
+body.assembly-ar-fullscreen #theory,
+body.assembly-ar-fullscreen #viewer3d,
+body.assembly-ar-fullscreen #ar,
+body.assembly-ar-fullscreen #quiz,
+body.assembly-ar-fullscreen #about { display: none !important; }
+body.assembly-ar-fullscreen #assembly .sec-head,
+body.assembly-ar-fullscreen #assembly .assembly-intro,
+body.assembly-ar-fullscreen #assembly .assembly-mode { display: none !important; }
+body.assembly-ar-fullscreen #assembly > .section {
+    padding: 0 !important; margin: 0 !important; max-width: none !important;
+}
+
+/* Доска — на весь экран, фон чёрный (виден видеопоток сквозь .ar-mode прозрачность) */
+body.assembly-ar-fullscreen .assembly-board {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: auto !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    z-index: 10000 !important;
+}
+body.assembly-ar-fullscreen .assembly-board::before,
+body.assembly-ar-fullscreen .assembly-board::after { display: none !important; }
+
+/* Статистика и лоток — overlay поверх видео */
+body.assembly-ar-fullscreen .assembly-stats {
+    position: fixed !important;
+    top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+    left: 12px !important;
+    right: 76px !important;
+    margin: 0 !important;
+    z-index: 10100 !important;
+    background: rgba(11,15,23,0.75) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-color: rgba(140,170,210,0.25) !important;
+}
+body.assembly-ar-fullscreen .assembly-stats .stat-card { padding: 8px 12px !important; }
+body.assembly-ar-fullscreen .assembly-stats .stat-value { font-size: 16px !important; }
+body.assembly-ar-fullscreen .assembly-stats .stat-label { font-size: 9px !important; }
+
+body.assembly-ar-fullscreen .assembly-tray-title { display: none !important; }
+body.assembly-ar-fullscreen .assembly-tray {
+    position: fixed !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+    left: 12px !important;
+    right: 12px !important;
+    z-index: 10100 !important;
+    background: rgba(11,15,23,0.80) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-color: rgba(140,170,210,0.25) !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    min-height: 0 !important;
+    padding: 10px !important;
+    gap: 6px !important;
+}
+body.assembly-ar-fullscreen .tray-item { padding: 8px 4px !important; }
+body.assembly-ar-fullscreen .tray-item-icon { font-size: 1.4rem !important; }
+body.assembly-ar-fullscreen .tray-item-name { font-size: 9px !important; margin-top: 4px !important; }
+
+body.assembly-ar-fullscreen .assembly-restart {
+    position: fixed !important;
+    top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
+    right: 76px !important;
+    z-index: 10100 !important;
+    margin: 0 !important;
+    display: none !important; /* убираем — выход через ✕ */
+}
+body.assembly-ar-fullscreen .assembly-win {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    z-index: 10200 !important;
+    max-width: 90vw;
+    margin: 0 !important;
+}
+
+/* Кнопка выхода из AR-сборки */
+.assembly-ar-exit-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 14px);
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    z-index: 10300;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(11,15,23,0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.assembly-ar-exit-btn:active { transform: scale(0.94); }
