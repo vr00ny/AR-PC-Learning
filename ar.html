@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <title>AR</title>
+    <title>AR Сборка</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
@@ -18,7 +18,7 @@
             z-index: 1 !important;
         }
         .status {
-            position: fixed; top: 14px; left: 14px;
+            position: fixed; top: 12px; left: 12px;
             background: rgba(11,15,23,0.85);
             color: #e6ecf5;
             padding: 6px 12px; border-radius: 6px;
@@ -29,10 +29,10 @@
         }
         .exit-btn {
             position: fixed;
-            top: calc(env(safe-area-inset-top, 0px) + 14px);
-            right: calc(env(safe-area-inset-right, 0px) + 14px);
+            top: calc(env(safe-area-inset-top, 0px) + 12px);
+            right: calc(env(safe-area-inset-right, 0px) + 12px);
             z-index: 200;
-            width: 46px; height: 46px;
+            width: 44px; height: 44px;
             border-radius: 50%;
             border: 1px solid rgba(255,255,255,0.25);
             background: rgba(11,15,23,0.78);
@@ -42,34 +42,96 @@
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
         .hint {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%);
             background: rgba(11,15,23,0.85);
             color: #4fd1c5;
-            padding: 10px 16px; border-radius: 10px;
+            padding: 8px 14px; border-radius: 8px;
             border: 1px solid rgba(79,209,197,0.35);
             font: 500 11px/1.4 "JetBrains Mono", monospace;
             z-index: 100; text-align: center;
             transition: opacity .3s;
+            white-space: nowrap;
         }
         .hint.hidden { opacity: 0; pointer-events: none; }
-        .controls {
-            position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-            left: 50%; transform: translateX(-50%);
-            display: flex; gap: 6px;
-            background: rgba(11,15,23,0.85);
-            padding: 6px; border-radius: 28px;
-            border: 1px solid rgba(140,170,210,0.25);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+
+        /* Прогресс сборки */
+        .progress {
+            position: fixed; top: 12px; right: 70px;
             z-index: 100;
-            max-width: calc(100vw - 28px); overflow-x: auto;
+            background: rgba(11,15,23,0.85);
+            border: 1px solid rgba(79,209,197,0.30);
+            padding: 6px 14px; border-radius: 8px;
+            font: 700 13px/1 "Space Grotesk", system-ui, sans-serif;
+            color: #4fd1c5;
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
         }
-        .controls button {
-            background: transparent; color: #e6ecf5;
-            border: 0; padding: 8px 14px; border-radius: 20px;
-            font: 600 11px/1 "Inter", system-ui, sans-serif;
-            cursor: pointer; white-space: nowrap;
+        .progress span { color: #e6ecf5; font-weight: 500; font-size: 11px; margin-right: 6px; }
+
+        /* Панель кнопок-деталей */
+        .parts {
+            position: fixed;
+            bottom: calc(env(safe-area-inset-bottom, 0px) + 12px);
+            left: 8px; right: 8px;
+            z-index: 100;
+            background: rgba(11,15,23,0.88);
+            border: 1px solid rgba(140,170,210,0.25);
+            border-radius: 14px;
+            padding: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
         }
-        .controls button.active { background: #4fd1c5; color: #072120; }
+        .parts button {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 10px 6px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(140,170,210,0.20);
+            border-radius: 10px;
+            color: #e6ecf5;
+            font: 600 11px/1.1 "Inter", system-ui, sans-serif;
+            cursor: pointer;
+            transition: background .15s, border-color .15s, opacity .15s;
+            text-align: center;
+        }
+        .parts button .ic { font-size: 20px; line-height: 1; }
+        .parts button:active { transform: scale(0.97); }
+        .parts button.done {
+            background: rgba(124,217,146,0.18);
+            border-color: rgba(124,217,146,0.6);
+            color: #7cd992;
+            opacity: 0.7;
+        }
+        .parts button.done .ic::after { content: " ✓"; }
+        .parts button:disabled { cursor: default; }
+
+        /* Поздравление в конце */
+        .done-msg {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 300;
+            background: rgba(11,15,23,0.95);
+            border: 1px solid rgba(79,209,197,0.5);
+            border-radius: 18px;
+            padding: 24px 28px;
+            text-align: center;
+            box-shadow: 0 0 60px rgba(79,209,197,0.25);
+            display: none;
+            max-width: 80vw;
+        }
+        .done-msg.show { display: block; }
+        .done-msg h2 {
+            margin: 0 0 8px; color: #4fd1c5;
+            font: 700 22px/1.2 "Space Grotesk", system-ui, sans-serif;
+        }
+        .done-msg p {
+            margin: 0 0 16px; color: #e6ecf5;
+            font: 400 14px/1.5 "Inter", system-ui, sans-serif;
+        }
+        .done-msg button {
+            background: #4fd1c5; color: #072120;
+            border: 0; padding: 10px 20px; border-radius: 22px;
+            font: 700 13px/1 inherit; cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -80,42 +142,45 @@
     vr-mode-ui="enabled: false"
     renderer="logarithmicDepthBuffer: true; antialias: true; alpha: true;">
 
-    <a-marker preset="hiro"
+    <a-marker preset="kanji"
               smooth="true" smoothCount="5"
               smoothTolerance="0.01" smoothThreshold="2">
-        <!-- Маленький индикатор-куб ровно на маркере: видно когда маркер пойман -->
-        <a-box id="lockedIndicator" position="0 0.02 0" scale="0.1 0.02 0.1"
-               material="color: #4fd1c5; opacity: 0.6; transparent: true"></a-box>
 
-        <!-- Модели — плоско лежат на маркере. По умолчанию видна материнка -->
-        <a-entity id="model-mb"
+        <!-- Виртуальный "корпус" — каркас (wireframe), внутри будут детали -->
+        <a-box position="0 0.3 0" scale="1.4 0.6 1.0"
+               material="color: #4fd1c5; wireframe: true; transparent: true; opacity: 0.65"></a-box>
+        <a-text value="CASE" position="-0.65 0.6 0.5" rotation="0 0 0"
+                color="#4fd1c5" scale="0.2 0.2 0.2"></a-text>
+
+        <!-- Детали — заранее размещены в "слотах" корпуса, скрыты по умолчанию -->
+        <a-entity id="part-mb"
                   gltf-model="assets/models/motherboard.glb"
-                  scale="0.25 0.25 0.25"
-                  rotation="-90 0 0"
-                  position="0 0.01 0"></a-entity>
-        <a-entity id="model-gpu"
-                  gltf-model="assets/models/gpu.glb"
-                  scale="0.18 0.18 0.18"
-                  rotation="-90 0 0"
-                  position="0 0.01 0"
+                  position="0 0.05 -0.2" rotation="-90 0 0" scale="0.35 0.35 0.35"
                   visible="false"></a-entity>
-        <a-entity id="model-ram"
+
+        <a-entity id="part-cpu"
+                  gltf-model="assets/models/cpu.glb"
+                  position="-0.35 0.1 -0.2" rotation="-90 0 0" scale="0.18 0.18 0.18"
+                  visible="false"></a-entity>
+
+        <a-entity id="part-ram"
                   gltf-model="assets/models/ram.glb"
-                  scale="0.2 0.2 0.2"
-                  rotation="-90 0 0"
-                  position="0 0.01 0"
+                  position="0.15 0.1 -0.25" rotation="-90 0 0" scale="0.2 0.2 0.2"
                   visible="false"></a-entity>
-        <a-entity id="model-ssd"
-                  gltf-model="assets/models/ssd.glb"
-                  scale="0.25 0.25 0.25"
-                  rotation="-90 0 0"
-                  position="0 0.01 0"
+
+        <a-entity id="part-gpu"
+                  gltf-model="assets/models/gpu.glb"
+                  position="0 0.1 0.05" rotation="-90 0 0" scale="0.2 0.2 0.2"
                   visible="false"></a-entity>
-        <a-entity id="model-psu"
-                  gltf-model="assets/models/psu.glb"
-                  scale="0.2 0.2 0.2"
-                  rotation="-90 0 0"
-                  position="0 0.01 0"
+
+        <a-entity id="part-ssd"
+                  gltf-model="assets/models/ssd_real.glb"
+                  position="-0.4 0.1 0.25" rotation="-90 0 0" scale="0.2 0.2 0.2"
+                  visible="false"></a-entity>
+
+        <a-entity id="part-psu"
+                  gltf-model="assets/models/psu_real.glb"
+                  position="0.4 0.1 0.25" rotation="-90 0 0" scale="0.18 0.18 0.18"
                   visible="false"></a-entity>
     </a-marker>
 
@@ -123,19 +188,27 @@
 </a-scene>
 
 <div class="status" id="status">// SEARCHING…</div>
-<div class="hint" id="hint">🎯 Наведи камеру на маркер Hiro</div>
+<div class="hint" id="hint">🎯 Наведи камеру на маркер Kanji</div>
+<div class="progress"><span>СОБРАНО</span><b id="progressN">0</b>/6</div>
 <button class="exit-btn" id="exitBtn" aria-label="Выйти">✕</button>
 
-<div class="controls" id="controls">
-    <button data-id="mb" class="active">🔧 Плата</button>
-    <button data-id="gpu">🎮 GPU</button>
-    <button data-id="ram">💾 RAM</button>
-    <button data-id="ssd">💿 SSD</button>
-    <button data-id="psu">🔌 БП</button>
+<div class="parts" id="parts">
+    <button data-part="mb"><div class="ic">🔧</div>Плата</button>
+    <button data-part="cpu"><div class="ic">⚙️</div>Процессор</button>
+    <button data-part="ram"><div class="ic">💾</div>RAM</button>
+    <button data-part="gpu"><div class="ic">🎮</div>Видеокарта</button>
+    <button data-part="ssd"><div class="ic">💿</div>SSD</button>
+    <button data-part="psu"><div class="ic">🔌</div>Блок питания</button>
+</div>
+
+<div class="done-msg" id="doneMsg">
+    <h2>🎉 ПК собран!</h2>
+    <p>Все 6 компонентов установлены в корпус. Поворачивай телефон чтобы увидеть ПК со всех сторон.</p>
+    <button onclick="resetAR()">Собрать заново</button>
 </div>
 
 <script>
-// Принудительно задняя камера (иначе iPhone Safari может открыть переднюю)
+// Принудительно задняя камера
 (function () {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
     const orig = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
@@ -150,7 +223,7 @@
     };
 })();
 
-// iOS Safari: video AR.js должно играть inline
+// iOS Safari: playsinline на video
 new MutationObserver(function () {
     const v = document.getElementById('arjs-video');
     if (!v) return;
@@ -164,7 +237,7 @@ const status = document.getElementById('status');
 const hint = document.getElementById('hint');
 const marker = document.querySelector('a-marker');
 marker.addEventListener('markerFound', function () {
-    status.textContent = '// MARKER · LOCKED';
+    status.textContent = '// MARKER LOCKED';
     hint.classList.add('hidden');
 });
 marker.addEventListener('markerLost', function () {
@@ -172,20 +245,41 @@ marker.addEventListener('markerLost', function () {
     hint.classList.remove('hidden');
 });
 
-// Переключение моделей
-const modelIds = ['mb', 'gpu', 'ram', 'ssd', 'psu'];
-document.getElementById('controls').addEventListener('click', function (e) {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const targetId = btn.dataset.id;
-    modelIds.forEach(function (id) {
-        const el = document.getElementById('model-' + id);
-        if (el) el.setAttribute('visible', id === targetId ? 'true' : 'false');
-    });
-    document.querySelectorAll('#controls button').forEach(function (b) {
-        b.classList.toggle('active', b.dataset.id === targetId);
-    });
+// Логика сборки
+const parts = ['mb', 'cpu', 'ram', 'gpu', 'ssd', 'psu'];
+const placed = new Set();
+const progressN = document.getElementById('progressN');
+const doneMsg = document.getElementById('doneMsg');
+
+document.querySelectorAll('[data-part]').forEach(function (btn) {
+    btn.onclick = function () {
+        const id = btn.dataset.part;
+        if (placed.has(id)) return;
+        placed.add(id);
+        const el = document.getElementById('part-' + id);
+        if (el) el.setAttribute('visible', 'true');
+        btn.classList.add('done');
+        btn.disabled = true;
+        progressN.textContent = placed.size;
+        if (placed.size === parts.length) {
+            setTimeout(function () { doneMsg.classList.add('show'); }, 400);
+        }
+    };
 });
+
+function resetAR() {
+    placed.clear();
+    parts.forEach(function (id) {
+        const el = document.getElementById('part-' + id);
+        if (el) el.setAttribute('visible', 'false');
+    });
+    document.querySelectorAll('[data-part]').forEach(function (b) {
+        b.classList.remove('done');
+        b.disabled = false;
+    });
+    progressN.textContent = '0';
+    doneMsg.classList.remove('show');
+}
 
 document.getElementById('exitBtn').onclick = function () {
     try { parent.postMessage({ type: 'ar-close' }, '*'); } catch (e) {}

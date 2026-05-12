@@ -47,8 +47,12 @@ function openMarkerAR() {
     iframe.src = 'ar.html?ts=' + Date.now();
     iframe.allow = 'camera; microphone; xr-spatial-tracking; gyroscope; accelerometer';
     iframe.setAttribute('allowfullscreen', '');
+    // Используем top/left/right/bottom вместо width/height — на iOS Safari
+    // 100vh не учитывает адресную строку, и iframe получался меньше viewport.
+    // Также 100dvh как fallback (поддерживается в новых браузерах).
     iframe.style.cssText =
-        'position:fixed;top:0;left:0;width:100vw;height:100vh;' +
+        'position:fixed;top:0;left:0;right:0;bottom:0;' +
+        'width:100%;height:100%;height:100dvh;' +
         'border:0;margin:0;padding:0;background:#000;z-index:10000;';
     document.body.appendChild(iframe);
 
