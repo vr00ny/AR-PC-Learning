@@ -290,7 +290,7 @@
 </a-scene>
 
 <div class="status" id="status">// SEARCHING…</div>
-<div class="hint" id="hint">🎯 Наведи камеру на маркер Kanji</div>
+<div class="hint" id="hint">🎯 Наведи камеру на маркер</div>
 <div class="progress"><span>СОБРАНО</span><b id="progressN">0</b>/6</div>
 <div class="next-hint" id="nextHint"><span>СЛЕДУЮЩИЙ:</span><b id="nextHintName">…</b></div>
 <button class="exit-btn" id="exitBtn" aria-label="Выйти">✕</button>
@@ -536,7 +536,11 @@ document.querySelectorAll('[data-part]').forEach(function (btn) {
         updateNextHint();
 
         if (placed.size === parts.length) {
-            setTimeout(function () { doneMsg.classList.add('show'); }, 600);
+            setTimeout(function () {
+                doneMsg.classList.add('show');
+                // Автоматически скрыть поздравление через 8 секунд
+                setTimeout(function () { doneMsg.classList.remove('show'); }, 8000);
+            }, 600);
         }
     };
 });
