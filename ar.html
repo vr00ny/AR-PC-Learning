@@ -146,42 +146,82 @@
               smooth="true" smoothCount="5"
               smoothTolerance="0.01" smoothThreshold="2">
 
-        <!-- Виртуальный "корпус" — каркас (wireframe), внутри будут детали -->
-        <a-box position="0 0.3 0" scale="1.4 0.6 1.0"
-               material="color: #4fd1c5; wireframe: true; transparent: true; opacity: 0.65"></a-box>
-        <a-text value="CASE" position="-0.65 0.6 0.5" rotation="0 0 0"
-                color="#4fd1c5" scale="0.2 0.2 0.2"></a-text>
+        <!-- Виртуальный КОРПУС ПК — большой полупрозрачный бокс над маркером.
+             Виден сразу как только маркер пойман. -->
+        <a-box position="0 0.4 0" scale="1.6 0.8 1.1"
+               material="color: #4fd1c5; opacity: 0.12; transparent: true; side: double"></a-box>
+        <!-- Чёткие рёбра корпуса (12 цилиндров) — без wireframe, чтобы было крупно видно -->
+        <a-entity position="0 0.4 0">
+            <!-- 4 нижних ребра -->
+            <a-cylinder position="0 -0.4 0.55" rotation="0 0 90" radius="0.012" height="1.6" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="0 -0.4 -0.55" rotation="0 0 90" radius="0.012" height="1.6" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="0.8 -0.4 0" rotation="90 0 0" radius="0.012" height="1.1" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="-0.8 -0.4 0" rotation="90 0 0" radius="0.012" height="1.1" color="#4fd1c5"></a-cylinder>
+            <!-- 4 верхних ребра -->
+            <a-cylinder position="0 0.4 0.55" rotation="0 0 90" radius="0.012" height="1.6" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="0 0.4 -0.55" rotation="0 0 90" radius="0.012" height="1.6" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="0.8 0.4 0" rotation="90 0 0" radius="0.012" height="1.1" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="-0.8 0.4 0" rotation="90 0 0" radius="0.012" height="1.1" color="#4fd1c5"></a-cylinder>
+            <!-- 4 вертикальных ребра -->
+            <a-cylinder position="0.8 0 0.55" radius="0.012" height="0.8" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="-0.8 0 0.55" radius="0.012" height="0.8" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="0.8 0 -0.55" radius="0.012" height="0.8" color="#4fd1c5"></a-cylinder>
+            <a-cylinder position="-0.8 0 -0.55" radius="0.012" height="0.8" color="#4fd1c5"></a-cylinder>
+        </a-entity>
+        <a-text value="PC CASE" position="0 0.95 0" align="center"
+                color="#4fd1c5" scale="0.25 0.25 0.25"></a-text>
 
-        <!-- Детали — заранее размещены в "слотах" корпуса, скрыты по умолчанию -->
-        <a-entity id="part-mb"
-                  gltf-model="assets/models/motherboard.glb"
-                  position="0 0.05 -0.2" rotation="-90 0 0" scale="0.35 0.35 0.35"
-                  visible="false"></a-entity>
+        <!-- Детали в виде ярких цветных блоков — гарантированно видны на iOS Safari -->
 
-        <a-entity id="part-cpu"
-                  gltf-model="assets/models/cpu.glb"
-                  position="-0.35 0.1 -0.2" rotation="-90 0 0" scale="0.18 0.18 0.18"
-                  visible="false"></a-entity>
+        <!-- Материнка — большая плоская плата на дне корпуса -->
+        <a-entity id="part-mb" visible="false">
+            <a-box position="0 0.07 0" scale="1.3 0.04 0.65"
+                   material="color: #5b8ef7; opacity: 0.95"></a-box>
+            <a-text value="MB" position="0 0.11 0" align="center"
+                    color="#fff" scale="0.18 0.18 0.18"></a-text>
+        </a-entity>
 
-        <a-entity id="part-ram"
-                  gltf-model="assets/models/ram.glb"
-                  position="0.15 0.1 -0.25" rotation="-90 0 0" scale="0.2 0.2 0.2"
-                  visible="false"></a-entity>
+        <!-- Процессор — маленький золотой квадрат на плате слева -->
+        <a-entity id="part-cpu" visible="false">
+            <a-box position="-0.35 0.13 -0.1" scale="0.18 0.05 0.18"
+                   material="color: #e8b65a; opacity: 0.95"></a-box>
+            <a-text value="CPU" position="-0.35 0.18 -0.1" align="center"
+                    color="#fff" scale="0.1 0.1 0.1"></a-text>
+        </a-entity>
 
-        <a-entity id="part-gpu"
-                  gltf-model="assets/models/gpu.glb"
-                  position="0 0.1 0.05" rotation="-90 0 0" scale="0.2 0.2 0.2"
-                  visible="false"></a-entity>
+        <!-- RAM — две зелёные длинные полоски справа от CPU -->
+        <a-entity id="part-ram" visible="false">
+            <a-box position="0.05 0.13 -0.1" scale="0.05 0.12 0.5"
+                   material="color: #7cd992; opacity: 0.95"></a-box>
+            <a-box position="0.15 0.13 -0.1" scale="0.05 0.12 0.5"
+                   material="color: #7cd992; opacity: 0.95"></a-box>
+            <a-text value="RAM" position="0.1 0.22 -0.1" align="center"
+                    color="#fff" scale="0.1 0.1 0.1"></a-text>
+        </a-entity>
 
-        <a-entity id="part-ssd"
-                  gltf-model="assets/models/ssd_real.glb"
-                  position="-0.4 0.1 0.25" rotation="-90 0 0" scale="0.2 0.2 0.2"
-                  visible="false"></a-entity>
+        <!-- Видеокарта — длинный фиолетовый блок горизонтально -->
+        <a-entity id="part-gpu" visible="false">
+            <a-box position="0 0.13 0.18" scale="0.95 0.06 0.18"
+                   material="color: #a78bfa; opacity: 0.95"></a-box>
+            <a-text value="GPU" position="0 0.18 0.18" align="center"
+                    color="#fff" scale="0.12 0.12 0.12"></a-text>
+        </a-entity>
 
-        <a-entity id="part-psu"
-                  gltf-model="assets/models/psu_real.glb"
-                  position="0.4 0.1 0.25" rotation="-90 0 0" scale="0.18 0.18 0.18"
-                  visible="false"></a-entity>
+        <!-- SSD — маленький белый прямоугольник на боковой стенке -->
+        <a-entity id="part-ssd" visible="false">
+            <a-box position="0.6 0.3 0.3" scale="0.08 0.15 0.22"
+                   material="color: #e6ecf5; opacity: 0.95"></a-box>
+            <a-text value="SSD" position="0.6 0.42 0.3" align="center"
+                    color="#000" scale="0.08 0.08 0.08"></a-text>
+        </a-entity>
+
+        <!-- Блок питания — оранжевый куб сверху-справа -->
+        <a-entity id="part-psu" visible="false">
+            <a-box position="0.5 0.6 -0.3" scale="0.5 0.3 0.4"
+                   material="color: #ff8c5a; opacity: 0.95"></a-box>
+            <a-text value="PSU" position="0.5 0.78 -0.3" align="center"
+                    color="#fff" scale="0.12 0.12 0.12"></a-text>
+        </a-entity>
     </a-marker>
 
     <a-entity camera></a-entity>
