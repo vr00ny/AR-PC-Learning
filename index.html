@@ -142,7 +142,7 @@
         <div class="reveal">
             <div class="hero-eyebrow">
                 <span class="pulse"></span>
-                AR · WebGL · v2026.05 · build IMPROVEMENTS-5
+                AR · WebGL · v2026.05 · build ASSEMBLY-CTA
             </div>
             <h1>
                 Открой системный блок,<br>
@@ -599,6 +599,31 @@
         <div class="assembly-tray" id="assemblyTray"></div>
 
         <div class="assembly-win" id="assemblyWin"></div>
+
+        <!-- CTA с анимацией → переход к AR-режиму -->
+        <div class="assembly-cta">
+            <div class="ac-visual">
+                <div class="ac-grid"></div>
+                <div class="ac-pulse"></div>
+                <div class="ac-pulse ac-pulse-2"></div>
+                <div class="ac-pulse ac-pulse-3"></div>
+                <div class="ac-chip">
+                    <div class="ac-chip-core"></div>
+                    <div class="ac-chip-traces"></div>
+                </div>
+                <div class="ac-tag">AR · LIVE</div>
+            </div>
+            <div class="ac-body">
+                <div class="ac-label">// УЖЕ СОБРАЛ?</div>
+                <h3>Попробуй сборку в AR</h3>
+                <p>Та же логика, но с камерой телефона: наведи на маркер — и собирай ПК в реальном пространстве. Подсветка следующего шага, ошибки, поздравление.</p>
+                <button class="ac-btn" onclick="openTabByName('ar')">
+                    Перейти к AR-сборке
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </button>
+            </div>
+        </div>
+
         <button class="assembly-restart" onclick="resetAssemblyState()">🔄 Начать заново</button>
     </section>
 </div>

@@ -27,7 +27,9 @@
     border: 1px solid var(--line);
     border-radius: 12px;
     overflow: hidden;
-    background: rgba(15,20,29,0.4);
+    background: var(--surface-translucent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 .stat-card {
     padding: 14px 18px;
@@ -293,6 +295,155 @@
     font-weight: 500;
     cursor: pointer;
     transition: background .2s, border-color .2s, color .2s;
+}
+
+/* ===== AR-CTA: анимированная карточка перехода к AR-сборке ===== */
+.assembly-cta {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 24px; align-items: center;
+    margin-top: 22px;
+    padding: 24px;
+    background:
+        radial-gradient(circle at 80% 20%, rgba(79,209,197,0.08), transparent 50%),
+        radial-gradient(circle at 10% 80%, rgba(91,142,247,0.06), transparent 50%),
+        var(--panel);
+    border: 1px solid rgba(79,209,197,0.25);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+}
+.assembly-cta::before {
+    content: ""; position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 60%, rgba(79,209,197,0.04) 100%);
+    pointer-events: none;
+}
+
+/* Левая часть — анимированный визуал */
+.ac-visual {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    border-radius: 12px;
+    background:
+        radial-gradient(circle at 50% 50%, rgba(79,209,197,0.05), transparent 70%),
+        linear-gradient(135deg, var(--bg-3), var(--bg-2));
+    border: 1px solid var(--line-2);
+    overflow: hidden;
+}
+.ac-grid {
+    position: absolute; inset: 0;
+    background-image:
+        linear-gradient(rgba(79,209,197,0.10) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,209,197,0.10) 1px, transparent 1px);
+    background-size: 20px 20px;
+    mask: radial-gradient(circle at center, #000 25%, transparent 75%);
+    -webkit-mask: radial-gradient(circle at center, #000 25%, transparent 75%);
+    opacity: 0.7;
+}
+.ac-pulse {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 40%; height: 40%;
+    border: 1px solid var(--teal);
+    border-radius: 50%;
+    opacity: 0;
+    animation: acRing 2.6s ease-out infinite;
+}
+.ac-pulse-2 { animation-delay: 0.9s; }
+.ac-pulse-3 { animation-delay: 1.8s; }
+@keyframes acRing {
+    0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0.7; }
+    100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+/* Чип в центре */
+.ac-chip {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 38%; height: 38%;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #0d2627, #061518);
+    border: 1px solid rgba(79,209,197,0.5);
+    box-shadow: 0 0 24px rgba(79,209,197,0.25), inset 0 0 0 1px rgba(255,255,255,0.06);
+}
+.ac-chip-core {
+    position: absolute; inset: 18%;
+    border-radius: 3px;
+    background:
+        repeating-linear-gradient(0deg, rgba(79,209,197,0.15) 0 2px, transparent 2px 4px),
+        linear-gradient(135deg, #1a4a4c, #0a2628);
+    box-shadow: inset 0 0 0 1px rgba(79,209,197,0.4);
+}
+.ac-chip-traces {
+    position: absolute; inset: 0;
+    background:
+        linear-gradient(transparent calc(50% - 0.5px), rgba(79,209,197,0.5) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+        linear-gradient(90deg, transparent calc(50% - 0.5px), rgba(79,209,197,0.5) calc(50% - 0.5px) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+    mask: radial-gradient(circle at center, transparent 30%, #000 32%);
+    -webkit-mask: radial-gradient(circle at center, transparent 30%, #000 32%);
+}
+.ac-tag {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(79,209,197,0.12);
+    border: 1px solid rgba(79,209,197,0.4);
+    color: var(--teal);
+    padding: 4px 10px; border-radius: 5px;
+    font: 600 9.5px/1 "JetBrains Mono", monospace;
+    letter-spacing: 0.14em;
+    z-index: 5;
+}
+.ac-tag::before {
+    content: ""; display: inline-block; width: 6px; height: 6px;
+    background: var(--teal); border-radius: 50%;
+    margin-right: 6px; vertical-align: middle;
+    animation: acBlink 1.2s ease-in-out infinite;
+}
+@keyframes acBlink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+}
+
+/* Правая часть — текст и кнопка */
+.ac-body { position: relative; z-index: 1; }
+.ac-label {
+    font: 600 10.5px/1 "JetBrains Mono", monospace;
+    letter-spacing: 0.14em;
+    color: var(--teal);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+.ac-body h3 {
+    font-family: "Space Grotesk";
+    font-weight: 600; font-size: 22px;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+    color: var(--ink);
+}
+.ac-body p {
+    color: var(--ink-dim);
+    font-size: 14px; line-height: 1.55;
+    margin: 0 0 18px;
+    max-width: 480px;
+}
+.ac-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px;
+    background: var(--teal);
+    color: var(--on-accent);
+    border: 0; border-radius: 10px;
+    font: 600 13.5px/1 inherit;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .2s;
+    box-shadow: 0 0 0 1px rgba(79,209,197,0.45), 0 8px 22px rgba(79,209,197,0.22);
+}
+.ac-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 1px rgba(79,209,197,0.55), 0 14px 30px rgba(79,209,197,0.32);
+}
+.ac-btn svg { width: 16px; height: 16px; }
+
+@media (max-width: 720px) {
+    .assembly-cta { grid-template-columns: 1fr; padding: 20px; }
+    .ac-visual { max-width: 180px; margin: 0 auto; }
 }
 .assembly-restart:hover {
     background: var(--bg-3);
