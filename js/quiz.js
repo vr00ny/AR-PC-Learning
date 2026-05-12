@@ -163,11 +163,39 @@ function checkQuiz() {
     if (percent < 50) rating = '⭐';
 
     saveScore(currentTestId, score, total);
+    // Трекинг прогресса курса (если progress.js загружен)
+    if (typeof trackQuizBest === 'function') trackQuizBest(currentTestId, percent);
+
+    // Собираем неправильные ответы для блока "Над чем поработать" (улучшение #5)
+    const misses = [];
+    test.questions.forEach((q, idx) => {
+        const selected = document.querySelector(`input[name="q${idx}"]:checked`);
+        if (!selected || selected.value !== q.correct) {
+            misses.push({ q: q.text, correct: q.correct, theoryId: q.theoryId || null });
+        }
+    });
 
     const resultDiv = document.getElementById('quizResult');
+    let missesHtml = '';
+    if (misses.length > 0) {
+        missesHtml = '<div class="qr-title">Над чем поработать</div>';
+        misses.forEach(m => {
+            const linkHtml = m.theoryId
+                ? `<a href="#" onclick="goToTheory('${m.theoryId}');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z"/><path d="M8 7h7M8 11h5"/></svg> К теории</a>`
+                : '';
+            missesHtml += `
+                <div class="qr-miss">
+                    <span class="x"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>
+                    <div class="q">${m.q}<small>Правильный ответ: <b>${m.correct}</b></small></div>
+                    ${linkHtml}
+                </div>`;
+        });
+    }
+
     resultDiv.innerHTML = `
         <div class="quiz-result-rating">${rating}</div>
         <div class="quiz-result-score">${score} из ${total} (${percent}%)</div>
+        ${missesHtml}
         <div class="quiz-result-actions">
             <button class="quiz-button" onclick="openTest('${currentTestId}')">🔄 Пройти ещё раз</button>
             <button class="quiz-button quiz-button-ghost" onclick="closeTest()">← К списку тестов</button>
@@ -175,4 +203,18 @@ function checkQuiz() {
     resultDiv.className = 'quiz-result success';
     resultDiv.style.display = 'block';
     resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Открыть нужный раздел теории
+function goToTheory(theoryId) {
+    if (typeof openTabByName === 'function') openTabByName('theory');
+    setTimeout(() => {
+        const el = document.querySelector('[data-theory-id="' + theoryId + '"]');
+        if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Если есть accordion-открывалка — открыть его
+            const summary = el.querySelector('summary');
+            if (summary && el.tagName === 'DETAILS') el.open = true;
+        }
+    }, 300);
 }

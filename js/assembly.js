@@ -229,6 +229,8 @@ function finishAssembly() {
         clearInterval(assemblyTimer);
         assemblyTimer = null;
     }
+    // Трекинг прогресса
+    if (typeof trackAssemblyDone === 'function') trackAssemblyDone();
     const seconds = Math.floor((Date.now() - assemblyState.startTime) / 1000);
     const win = document.getElementById('assemblyWin');
     const mistakes = assemblyState.mistakes;

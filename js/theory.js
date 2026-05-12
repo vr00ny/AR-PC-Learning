@@ -26,6 +26,7 @@ function loadTheory() {
         const accent = theoryAccents[i % theoryAccents.length];
         card.className = 'theory-card' + (accent ? ' ' + accent : '');
         card.dataset.id = topic.id;
+        card.setAttribute('data-theory-id', topic.id);
         const bodyHtml = topic.sections.map(renderSection).join('');
         const idLabel = 'THEORY.' + String(i + 1).padStart(2, '0');
         card.innerHTML = `
@@ -42,6 +43,10 @@ function loadTheory() {
 
         card.querySelector('.theory-header').onclick = () => {
             card.classList.toggle('open');
+            // Трекинг прогресса при первом открытии
+            if (card.classList.contains('open') && typeof trackTheoryView === 'function') {
+                trackTheoryView(topic.id);
+            }
         };
     });
 }

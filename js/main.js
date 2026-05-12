@@ -1,5 +1,24 @@
 // Главный скрипт: переключение вкладок, мобильное меню, анимации появления, переключение темы.
 
+// ===== Полноэкранный показ маркера =====
+function openMarkerFullscreen() {
+    const overlay = document.getElementById('markerOverlay');
+    if (!overlay) return;
+    overlay.classList.add('show');
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) { try { req.call(el); } catch (e) {} }
+}
+function closeMarkerFullscreen() {
+    const overlay = document.getElementById('markerOverlay');
+    if (!overlay) return;
+    overlay.classList.remove('show');
+    if (document.fullscreenElement || document.webkitFullscreenElement) {
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        if (exit) { try { exit.call(document); } catch (e) {} }
+    }
+}
+
 // ===== Переключение темы (тёмная / светлая) =====
 // Применение из localStorage уже в <head>, тут только сама кнопка
 const themeBtn = document.getElementById('themeToggle');

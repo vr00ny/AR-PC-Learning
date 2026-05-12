@@ -37,6 +37,8 @@ function loadAR() {
 // Открыть AR.js в iframe поверх сайта
 function openMarkerAR() {
     if (document.getElementById('arIframe')) return;
+    // Трекинг — пользователь хотя бы запустил AR
+    if (typeof trackArDone === 'function') trackArDone();
 
     const iframe = document.createElement('iframe');
     iframe.id = 'arIframe';

@@ -327,6 +327,50 @@
     gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+/* Блок "Над чем поработать" — ошибки с ссылками на теорию (улучшение #5) */
+.qr-title {
+    font-family: "JetBrains Mono"; font-size: 11px;
+    color: var(--ink-mute); letter-spacing: 0.1em;
+    text-transform: uppercase; margin: 22px 0 12px;
+    text-align: left;
+}
+.qr-miss {
+    display: flex; align-items: center; gap: 14px; padding: 14px;
+    background: rgba(239,107,107,0.04);
+    border: 1px solid rgba(239,107,107,0.18);
+    border-radius: 10px; margin-bottom: 8px;
+    text-align: left;
+}
+.qr-miss .x {
+    flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+    background: rgba(239,107,107,0.15);
+    color: var(--red);
+    display: grid; place-items: center;
+}
+.qr-miss .x svg { width: 14px; height: 14px; }
+.qr-miss .q { flex: 1; font-size: 14px; color: var(--ink); line-height: 1.4; }
+.qr-miss .q small {
+    display: block; color: var(--ink-mute); font-size: 12px; margin-top: 3px;
+}
+.qr-miss .q small b { color: var(--green); font-weight: 600; }
+.qr-miss a {
+    flex-shrink: 0; padding: 8px 12px; border-radius: 8px;
+    background: rgba(79,209,197,0.10);
+    color: var(--teal);
+    font-size: 12px; font-weight: 500;
+    border: 1px solid rgba(79,209,197,0.25);
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: background .2s;
+    text-decoration: none;
+}
+.qr-miss a:hover { background: rgba(79,209,197,0.18); }
+.qr-miss a svg { width: 13px; height: 13px; }
+@media (max-width: 600px) {
+    .qr-miss { flex-direction: column; align-items: flex-start; }
+    .qr-miss a { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 1100px) {
