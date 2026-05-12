@@ -114,6 +114,44 @@
         .parts button.done .ic::after { content: " ✓"; }
         .parts button:disabled { cursor: default; }
 
+        /* Информационная плашка про установленный компонент */
+        .part-info {
+            position: fixed;
+            top: 56px; left: 8px; right: 8px;
+            z-index: 150;
+            background: rgba(11,15,23,0.94);
+            border: 1px solid rgba(79,209,197,0.5);
+            border-radius: 12px;
+            padding: 12px 14px;
+            color: #e6ecf5;
+            font: 13px/1.45 "Inter", system-ui, sans-serif;
+            transform: translateY(-12px);
+            opacity: 0;
+            transition: opacity .25s ease, transform .25s ease;
+            pointer-events: none;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            max-height: 38vh; overflow-y: auto;
+        }
+        .part-info.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .part-info-title {
+            font: 700 14px/1.2 "Space Grotesk", system-ui, sans-serif;
+            color: #4fd1c5;
+            margin-bottom: 6px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .part-info-title .ic { font-size: 18px; }
+        .part-info p { margin: 0 0 6px; }
+        .part-info b { color: #4fd1c5; }
+        .part-info-close {
+            position: absolute; top: 6px; right: 6px;
+            width: 26px; height: 26px;
+            border: 0; border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            color: #e6ecf5;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
         /* Поздравление в конце */
         .done-msg {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -155,31 +193,56 @@
               smooth="true" smoothCount="5"
               smoothTolerance="0.01" smoothThreshold="2">
 
-        <!-- ВСЕГДА ВИДИМЫЕ объекты на маркере — доказывают что AR-рендер работает.
-             Все позиции/масштабы в "marker units" где 1 = ширина маркера. -->
+        <!-- "ПОЛ" корпуса — лежит на маркере, имитирует открытую боковую крышку ATX -->
+        <a-box position="0 0.005 0" scale="0.85 0.01 0.85"
+               material="color: #1a2530; opacity: 0.55; transparent: true"></a-box>
+        <!-- Задняя стенка корпуса -->
+        <a-box position="0 0.2 -0.42" scale="0.85 0.4 0.01"
+               material="color: #1a2530; opacity: 0.35; transparent: true"></a-box>
+        <!-- Тонкая бирюзовая рамка пола -->
+        <a-cylinder position=" 0.425 0.012  0   " rotation="90 0 0"  radius="0.005" height="0.85" color="#4fd1c5"></a-cylinder>
+        <a-cylinder position="-0.425 0.012  0   " rotation="90 0 0"  radius="0.005" height="0.85" color="#4fd1c5"></a-cylinder>
+        <a-cylinder position=" 0     0.012  0.425" rotation="0 0 90"  radius="0.005" height="0.85" color="#4fd1c5"></a-cylinder>
+        <a-cylinder position=" 0     0.012 -0.425" rotation="0 0 90"  radius="0.005" height="0.85" color="#4fd1c5"></a-cylinder>
 
-        <!-- Большой красный шар над маркером — должен быть виден сразу -->
-        <a-sphere id="alwaysVisible" position="0 0.3 0" radius="0.25"
-                  material="color: #ff6b6b; opacity: 0.95"></a-sphere>
+        <a-text value="PC CASE" position="0 0.55 -0.42" align="center"
+                color="#4fd1c5" scale="0.18 0.18 0.18"></a-text>
 
-        <!-- Подпись -->
-        <a-text value="PC CASE" position="0 0.9 0" align="center"
-                color="#4fd1c5" scale="0.4 0.4 0.4"></a-text>
+        <!-- Реалистичная раскладка компонентов (вид сверху на распахнутый корпус):
+             1. Материнка прислонена к задней стенке (большая плата)
+             2. Процессор в центр-верх платы (где сокет)
+             3. RAM правее процессора (DIMM-слоты)
+             4. Видеокарта горизонтально ниже процессора (PCIe x16)
+             5. SSD сбоку (отсек 2.5")
+             6. БП внизу в углу (отсек PSU) -->
 
-        <!-- 6 деталей-боксов в виде сетки 3x2 над маркером.
-             Изначально скрыты, появляются по нажатию кнопок. -->
-        <a-box id="part-mb"  position="-0.35  0.30 -0.25" scale="0.25 0.25 0.25"
-               material="color: #5b8ef7" visible="false"></a-box>
-        <a-box id="part-cpu" position=" 0.00  0.30 -0.25" scale="0.25 0.25 0.25"
-               material="color: #e8b65a" visible="false"></a-box>
-        <a-box id="part-ram" position=" 0.35  0.30 -0.25" scale="0.25 0.25 0.25"
-               material="color: #7cd992" visible="false"></a-box>
-        <a-box id="part-gpu" position="-0.35  0.30  0.10" scale="0.25 0.25 0.25"
-               material="color: #a78bfa" visible="false"></a-box>
-        <a-box id="part-ssd" position=" 0.00  0.30  0.10" scale="0.25 0.25 0.25"
-               material="color: #e6ecf5" visible="false"></a-box>
-        <a-box id="part-psu" position=" 0.35  0.30  0.10" scale="0.25 0.25 0.25"
-               material="color: #ff8c5a" visible="false"></a-box>
+        <!-- Материнская плата — большой тонкий прямоугольник у задней стенки -->
+        <a-box id="part-mb" position="-0.05 0.04 -0.18" scale="0.55 0.015 0.4"
+               material="color: #5b8ef7; opacity: 0.95" visible="false"></a-box>
+
+        <!-- Процессор — маленький золотой квадрат на плате (сокет) -->
+        <a-box id="part-cpu" position="-0.12 0.07 -0.22" scale="0.09 0.04 0.09"
+               material="color: #e8b65a; opacity: 0.95" visible="false"></a-box>
+
+        <!-- RAM — две тонкие вертикальные планки справа от процессора (DIMM-слоты) -->
+        <a-entity id="part-ram" visible="false">
+            <a-box position=" 0.05 0.09 -0.22" scale="0.025 0.10 0.22"
+                   material="color: #7cd992; opacity: 0.95"></a-box>
+            <a-box position=" 0.10 0.09 -0.22" scale="0.025 0.10 0.22"
+                   material="color: #7cd992; opacity: 0.95"></a-box>
+        </a-entity>
+
+        <!-- Видеокарта — длинная горизонтальная карта в нижней части платы (PCIe x16) -->
+        <a-box id="part-gpu" position="-0.05 0.08 -0.05" scale="0.5 0.05 0.13"
+               material="color: #a78bfa; opacity: 0.95" visible="false"></a-box>
+
+        <!-- SSD — компактный прямоугольник в правом боковом отсеке -->
+        <a-box id="part-ssd" position="0.32 0.05 0.10" scale="0.07 0.02 0.16"
+               material="color: #e6ecf5; opacity: 0.95" visible="false"></a-box>
+
+        <!-- Блок питания — крупный блок в нижнем-левом углу корпуса (отсек PSU) -->
+        <a-box id="part-psu" position="-0.28 0.08 0.28" scale="0.28 0.13 0.22"
+               material="color: #ff8c5a; opacity: 0.95" visible="false"></a-box>
     </a-marker>
 
     <a-entity camera></a-entity>
@@ -189,6 +252,12 @@
 <div class="hint" id="hint">🎯 Наведи камеру на маркер Kanji</div>
 <div class="progress"><span>СОБРАНО</span><b id="progressN">0</b>/6</div>
 <button class="exit-btn" id="exitBtn" aria-label="Выйти">✕</button>
+
+<div class="part-info" id="partInfo">
+    <button class="part-info-close" onclick="hideInfo()" aria-label="Закрыть">✕</button>
+    <div class="part-info-title" id="partInfoTitle"></div>
+    <div id="partInfoBody"></div>
+</div>
 
 <div class="parts" id="parts">
     <button data-part="mb"><div class="ic">🔧</div>Плата</button>
@@ -276,6 +345,76 @@ const placed = new Set();
 const progressN = document.getElementById('progressN');
 const doneMsg = document.getElementById('doneMsg');
 
+// Информационные сводки про каждый компонент: куда ставится и как связан с другими
+const partInfo = {
+    mb: {
+        icon: '🔧',
+        title: 'Материнская плата',
+        body:
+            '<p><b>Где стоит:</b> крепится к боковой стенке корпуса винтами (стойками). Это «фундамент» всей сборки.</p>' +
+            '<p><b>Связи:</b> в её сокет ставится <b>процессор</b>, в DIMM-слоты — <b>оперативная память</b>, в PCIe x16 — <b>видеокарта</b>. Через её дорожки все компоненты «общаются».</p>' +
+            '<p><b>Питание:</b> от <b>блока питания</b> через разъём ATX 24-pin (главный) + 4/8-pin к процессору.</p>'
+    },
+    cpu: {
+        icon: '⚙️',
+        title: 'Процессор (CPU)',
+        body:
+            '<p><b>Где стоит:</b> в специальный сокет на материнской плате — в центре платы, ближе к верху. Закрепляется рычагом, сверху ставится кулер.</p>' +
+            '<p><b>Зачем:</b> «мозг» компьютера — выполняет инструкции программ, обрабатывает данные.</p>' +
+            '<p><b>Связи:</b> напрямую общается с <b>оперативной памятью</b> по высокоскоростной шине и с <b>чипсетом</b> материнки, который рулит остальной периферией.</p>'
+    },
+    ram: {
+        icon: '💾',
+        title: 'Оперативная память (RAM)',
+        body:
+            '<p><b>Где стоит:</b> в длинные слоты DIMM рядом с процессором — обычно 2 или 4 штуки.</p>' +
+            '<p><b>Зачем:</b> быстрое временное хранилище. Когда запускаешь программу — она загружается из SSD в RAM, и процессор работает уже с RAM (она в десятки раз быстрее накопителя).</p>' +
+            '<p><b>Совет:</b> ставь сразу 2 одинаковые планки в разные слоты — это активирует двухканальный режим и удваивает скорость памяти.</p>'
+    },
+    gpu: {
+        icon: '🎮',
+        title: 'Видеокарта (GPU)',
+        body:
+            '<p><b>Где стоит:</b> в слот <b>PCI-Express x16</b> на материнке — горизонтально, ниже процессора. К ней с задней стороны подключаются монитор и доп. питание от БП.</p>' +
+            '<p><b>Зачем:</b> отвечает за вывод картинки и тяжёлые 3D-расчёты (игры, монтаж, нейросети).</p>' +
+            '<p><b>Связи:</b> получает данные от процессора через PCIe-шину, питание — отдельным кабелем 6/8-pin от <b>блока питания</b>.</p>'
+    },
+    ssd: {
+        icon: '💿',
+        title: 'SSD-накопитель',
+        body:
+            '<p><b>Где стоит:</b> либо в слот M.2 прямо на материнке (NVMe SSD), либо в отсек 2.5" в корпусе с SATA-кабелем.</p>' +
+            '<p><b>Зачем:</b> постоянное хранилище — здесь лежат операционная система, программы и файлы. В отличие от RAM, не теряет данные при выключении.</p>' +
+            '<p><b>Связи:</b> NVMe SSD общается с процессором напрямую через PCIe (очень быстро). SATA — через чипсет материнки.</p>'
+    },
+    psu: {
+        icon: '🔌',
+        title: 'Блок питания (PSU)',
+        body:
+            '<p><b>Где стоит:</b> в специальный отсек снизу или сверху корпуса. Вентилятор обычно смотрит наружу/вниз.</p>' +
+            '<p><b>Зачем:</b> преобразует переменный ток 220 В из розетки в постоянный 12/5/3.3 В для всех компонентов.</p>' +
+            '<p><b>Связи:</b> питает <b>материнку</b> (ATX 24-pin), <b>процессор</b> (4/8-pin EPS), <b>видеокарту</b> (6/8-pin PCIe), накопители (SATA-power).</p>'
+    }
+};
+
+const infoBox = document.getElementById('partInfo');
+const infoTitle = document.getElementById('partInfoTitle');
+const infoBody = document.getElementById('partInfoBody');
+let infoTimer = null;
+function showInfo(id) {
+    const data = partInfo[id];
+    if (!data) return;
+    infoTitle.innerHTML = '<span class="ic">' + data.icon + '</span>' + data.title;
+    infoBody.innerHTML = data.body;
+    infoBox.classList.add('show');
+    if (infoTimer) clearTimeout(infoTimer);
+    infoTimer = setTimeout(hideInfo, 8000);
+}
+function hideInfo() {
+    infoBox.classList.remove('show');
+    if (infoTimer) { clearTimeout(infoTimer); infoTimer = null; }
+}
+
 // Двойная установка видимости: attribute + Three.js object3D.
 // setAttribute('visible', 'true') в A-Frame не всегда пропагируется на детей,
 // особенно когда entity — обёртка с a-box/a-text внутри.
@@ -301,14 +440,18 @@ function setPartVisible(id, on) {
 document.querySelectorAll('[data-part]').forEach(function (btn) {
     btn.onclick = function () {
         const id = btn.dataset.part;
-        if (placed.has(id)) return;
+        if (placed.has(id)) {
+            // Если уже установлен — просто показываем инфо ещё раз
+            showInfo(id);
+            return;
+        }
         placed.add(id);
         setPartVisible(id, true);
+        showInfo(id);
         btn.classList.add('done');
-        btn.disabled = true;
         progressN.textContent = placed.size;
         if (placed.size === parts.length) {
-            setTimeout(function () { doneMsg.classList.add('show'); }, 400);
+            setTimeout(function () { doneMsg.classList.add('show'); }, 600);
         }
     };
 });
@@ -318,10 +461,10 @@ function resetAR() {
     parts.forEach(function (id) { setPartVisible(id, false); });
     document.querySelectorAll('[data-part]').forEach(function (b) {
         b.classList.remove('done');
-        b.disabled = false;
     });
     progressN.textContent = '0';
     doneMsg.classList.remove('show');
+    hideInfo();
 }
 
 document.getElementById('exitBtn').onclick = function () {
