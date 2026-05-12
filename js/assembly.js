@@ -59,9 +59,15 @@ function renderAssemblyTray() {
         div.className = 'tray-item';
         div.dataset.type = c.type;
         div.dataset.idx = idx;
-        div.innerHTML = `
-            <div class="tray-item-icon">${c.icon}</div>
-            <div class="tray-item-name">${c.name}</div>`;
+        // model-viewer показывает 3D-превью; pointer-events:none пропускает
+        // драг-события в родителя .tray-item
+        const visual = c.model
+            ? `<model-viewer src="${c.model}" alt="${c.name}" auto-rotate
+                  rotation-per-second="30deg" disable-zoom disable-tap interaction-prompt="none"
+                  camera-orbit="45deg 70deg auto" shadow-intensity="0"
+                  exposure="1" class="tray-item-model"></model-viewer>`
+            : `<div class="tray-item-icon">${c.icon}</div>`;
+        div.innerHTML = `${visual}<div class="tray-item-name">${c.name}</div>`;
         attachDragHandlers(div);
         tray.appendChild(div);
     });
@@ -176,7 +182,15 @@ function placeItemInSlot(item, slot) {
     const component = assemblyData.components[item.dataset.idx];
     item.classList.add('placed');
     slot.classList.add('filled');
-    slot.innerHTML = component.icon;
+    // В слоте — крутящаяся 3D-моделька, если задана
+    if (component.model) {
+        slot.innerHTML = `<model-viewer src="${component.model}" alt="${component.name}"
+            auto-rotate rotation-per-second="20deg" disable-zoom disable-tap
+            interaction-prompt="none" shadow-intensity="0" exposure="1"
+            class="slot-model"></model-viewer>`;
+    } else {
+        slot.innerHTML = component.icon;
+    }
     assemblyState.placed[slotId] = item.dataset.idx;
     updateStats();
     if (Object.keys(assemblyState.placed).length === assemblyData.slots.length) {

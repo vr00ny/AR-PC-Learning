@@ -3,7 +3,8 @@
 // Перетянул деталь в правильный отсек — засчитано.
 //
 // slots — позиции отсеков (в % от размера доски).
-// components — что лежит в лотке, type должен совпадать с accepts соответствующего отсека.
+// components — что лежит в лотке. type должен совпадать с accepts соответствующего отсека.
+// model — путь к .glb-модели (показывается вместо emoji-иконки).
 const assemblyData = {
     slots: [
         // Верхний ряд: кулер CPU слева, блок питания справа
@@ -27,11 +28,11 @@ const assemblyData = {
           x: 70, y: 52, w: 24, h: 18 }
     ],
     components: [
-        { type: 'mobo',   icon: '🔲', name: 'Материнская плата' },
-        { type: 'cooler', icon: '🌀', name: 'Кулер CPU' },
-        { type: 'psu',    icon: '🔌', name: 'Блок питания' },
-        { type: 'gpu',    icon: '🎮', name: 'Видеокарта' },
-        { type: 'ssd',    icon: '💿', name: 'SSD' },
-        { type: 'hdd',    icon: '💾', name: 'HDD' }
+        { type: 'mobo',   icon: '🔲', name: 'Материнская плата', model: 'assets/models/motherboard.glb' },
+        { type: 'cooler', icon: '🌀', name: 'Кулер CPU'           /* без модели — cpu.glb весит 81МБ */ },
+        { type: 'psu',    icon: '🔌', name: 'Блок питания',       model: 'assets/models/psu_real.glb' },
+        { type: 'gpu',    icon: '🎮', name: 'Видеокарта',         model: 'assets/models/gpu_real.glb' },
+        { type: 'ssd',    icon: '💿', name: 'SSD',                model: 'assets/models/ssd_real.glb' },
+        { type: 'hdd',    icon: '💾', name: 'HDD',                model: 'assets/models/hdd.glb' }
     ]
 };

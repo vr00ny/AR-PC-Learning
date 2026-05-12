@@ -196,6 +196,33 @@
     text-transform: uppercase;
 }
 
+/* 3D-превью детали в лотке — крутящаяся glb-модель */
+.tray-item-model {
+    width: 100%;
+    height: 70px;
+    background: transparent;
+    --poster-color: transparent;
+    pointer-events: none; /* пропускаем drag-события в родительский .tray-item */
+    display: block;
+    margin: 0 auto;
+}
+/* 3D-моделька в установленном слоте — занимает весь слот */
+.slot-model {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    --poster-color: transparent;
+    pointer-events: none;
+    display: block;
+}
+/* Когда деталь установлена — у слота нет text/padding, чтобы 3D было крупно */
+.assembly-slot.filled {
+    padding: 0;
+    font-size: 0;
+}
+/* Лоток-элемент чуть выше теперь — нужно место под 3D */
+.tray-item { padding: 10px 8px 12px; }
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     20% { transform: translateX(-8px); }
