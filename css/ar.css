@@ -99,6 +99,64 @@ body.ar-active {
     position: static !important;
 }
 
+/* ===== Fullscreen-режим AR-вкладки ===== */
+/* iOS Safari всё равно стремится развернуть камеру на весь viewport,
+   поэтому встраивать в маленькую рамку ненадёжно. Делаем нормальный AR-UX:
+   при включении камеры сайт прячется, AR на весь экран, кнопка выхода в углу. */
+body.ar-fullscreen { overflow: hidden !important; }
+body.ar-fullscreen > .topbar,
+body.ar-fullscreen > footer,
+body.ar-fullscreen #home,
+body.ar-fullscreen #components,
+body.ar-fullscreen #theory,
+body.ar-fullscreen #viewer3d,
+body.ar-fullscreen #assembly,
+body.ar-fullscreen #quiz,
+body.ar-fullscreen #about { display: none !important; }
+body.ar-fullscreen #ar .sec-head,
+body.ar-fullscreen #ar .ar-instructions,
+body.ar-fullscreen #ar .camera-buttons { display: none !important; }
+body.ar-fullscreen #ar > .section { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+body.ar-fullscreen .ar-wrapper {
+    position: fixed !important;
+    inset: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    z-index: 10000 !important;
+    background: #000 !important;
+}
+body.ar-fullscreen .ar-wrapper::before { display: none !important; }
+body.ar-fullscreen .ar-container {
+    height: 100% !important;
+    min-height: 0 !important;
+    border-radius: 0 !important;
+}
+
+/* Кнопка выхода из AR */
+.ar-exit-btn {
+    position: fixed;
+    top: calc(env(safe-area-inset-top, 0px) + 14px);
+    right: calc(env(safe-area-inset-right, 0px) + 14px);
+    z-index: 10100;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(11,15,23,0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #fff;
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+}
+.ar-exit-btn:active { transform: scale(0.94); }
+
 .ar-controls {
     position: absolute;
     bottom: 14px;

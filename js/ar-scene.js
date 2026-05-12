@@ -81,6 +81,11 @@ function destroyARScene() {
 
     document.body.classList.remove('ar-active');
     document.documentElement.classList.remove('ar-active');
+    document.body.classList.remove('ar-fullscreen');
+
+    // Убрать кнопку выхода
+    const exitBtn = document.getElementById('arExitBtn');
+    if (exitBtn) exitBtn.remove();
 
     isCameraOn = false;
     const info = document.getElementById('arInfoLabel');
@@ -195,6 +200,20 @@ function createARScene() {
     // CSS-класс с !important-правилами защищает body/html от попыток AR.js поменять их inline-стили
     document.body.classList.add('ar-active');
     document.documentElement.classList.add('ar-active');
+    // Fullscreen-режим — сайт прячется, AR на весь экран
+    document.body.classList.add('ar-fullscreen');
+
+    // Кнопка "Выйти из AR" в правом верхнем углу
+    let exitBtn = document.getElementById('arExitBtn');
+    if (!exitBtn) {
+        exitBtn = document.createElement('button');
+        exitBtn.id = 'arExitBtn';
+        exitBtn.className = 'ar-exit-btn';
+        exitBtn.setAttribute('aria-label', 'Выйти из AR');
+        exitBtn.innerHTML = '✕';
+        exitBtn.onclick = () => destroyARScene();
+        document.body.appendChild(exitBtn);
+    }
 
     // AR.js создаёт <video> асинхронно после getUserMedia. MutationObserver
     // мгновенно поймает появление видео и припаркует его в контейнер,
