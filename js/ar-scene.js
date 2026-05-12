@@ -15,6 +15,78 @@ let savedBodyStyle = null;
 let savedHtmlStyle = null;
 let videoParkObserver = null;
 let originalGetUserMedia = null;
+let fullscreenWatchdog = null;
+
+// Список селекторов, которые нужно скрыть в AR-fullscreen режиме.
+// Используем inline-стили вместо CSS-класса — надёжнее на iOS Safari,
+// где AR.js может перебивать стили в момент инициализации.
+const AR_FULLSCREEN_HIDE = [
+    'body > .topbar',
+    'body > footer',
+    'main > .tab-content:not(#ar)',
+    '#ar .sec-head',
+    '#ar .ar-instructions',
+    '#ar .camera-buttons',
+    '#ar .marker-actions'
+];
+
+function enterArFullscreen() {
+    AR_FULLSCREEN_HIDE.forEach(sel => {
+        document.querySelectorAll(sel).forEach(el => {
+            if (el.dataset.arPrevDisplay === undefined) {
+                el.dataset.arPrevDisplay = el.style.display || '';
+            }
+            el.style.setProperty('display', 'none', 'important');
+        });
+    });
+    // AR-wrapper на весь экран — inline-стили с !important побеждают всё
+    const wrapper = document.querySelector('.ar-wrapper');
+    if (wrapper) {
+        if (wrapper.dataset.arPrevStyle === undefined) {
+            wrapper.dataset.arPrevStyle = wrapper.getAttribute('style') || '';
+        }
+        wrapper.setAttribute('style',
+            'position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;' +
+            'width:100vw!important;height:100vh!important;height:100dvh!important;' +
+            'margin:0!important;padding:0!important;border-radius:0!important;border:0!important;' +
+            'z-index:10000!important;background:#000!important;'
+        );
+    }
+    const container = document.getElementById('arContainer');
+    if (container) {
+        if (container.dataset.arPrevStyle === undefined) {
+            container.dataset.arPrevStyle = container.getAttribute('style') || '';
+        }
+        container.setAttribute('style',
+            'width:100%!important;height:100%!important;min-height:0!important;border-radius:0!important;'
+        );
+    }
+    document.body.style.setProperty('overflow', 'hidden', 'important');
+    document.documentElement.style.setProperty('overflow', 'hidden', 'important');
+}
+
+function exitArFullscreen() {
+    document.querySelectorAll('[data-ar-prev-display]').forEach(el => {
+        const prev = el.dataset.arPrevDisplay;
+        el.style.display = prev;
+        if (!prev) el.style.removeProperty('display');
+        delete el.dataset.arPrevDisplay;
+    });
+    const wrapper = document.querySelector('.ar-wrapper');
+    if (wrapper && wrapper.dataset.arPrevStyle !== undefined) {
+        const prev = wrapper.dataset.arPrevStyle;
+        if (prev) wrapper.setAttribute('style', prev); else wrapper.removeAttribute('style');
+        delete wrapper.dataset.arPrevStyle;
+    }
+    const container = document.getElementById('arContainer');
+    if (container && container.dataset.arPrevStyle !== undefined) {
+        const prev = container.dataset.arPrevStyle;
+        if (prev) container.setAttribute('style', prev); else container.removeAttribute('style');
+        delete container.dataset.arPrevStyle;
+    }
+    document.body.style.removeProperty('overflow');
+    document.documentElement.style.removeProperty('overflow');
+}
 
 // Снимок элементов body ДО запуска AR — чтобы после удалить только то, что AR.js добавил
 let bodyChildrenSnapshot = null;
@@ -106,6 +178,13 @@ function destroyARScene() {
     document.body.classList.remove('ar-active');
     document.documentElement.classList.remove('ar-active');
     document.body.classList.remove('ar-fullscreen');
+
+    // Выключить watchdog и вернуть inline-стили в исходное состояние
+    if (fullscreenWatchdog) {
+        clearInterval(fullscreenWatchdog);
+        fullscreenWatchdog = null;
+    }
+    exitArFullscreen();
 
     // Восстанавливаем оригинальный getUserMedia
     restoreGetUserMedia();
@@ -315,8 +394,20 @@ function createARScene() {
     // CSS-класс с !important-правилами защищает body/html от попыток AR.js поменять их inline-стили
     document.body.classList.add('ar-active');
     document.documentElement.classList.add('ar-active');
-    // Fullscreen-режим — сайт прячется, AR на весь экран
+    // Fullscreen-режим: и inline-стили (надёжно на iOS), и класс (резерв для CSS)
+    enterArFullscreen();
     document.body.classList.add('ar-fullscreen');
+
+    // Watchdog: AR.js при инициализации может перетереть стили wrapper'а.
+    // Каждые 500мс проверяем что fullscreen всё ещё активен.
+    if (fullscreenWatchdog) clearInterval(fullscreenWatchdog);
+    fullscreenWatchdog = setInterval(() => {
+        if (!isCameraOn) return;
+        const wrapper = document.querySelector('.ar-wrapper');
+        if (wrapper && !wrapper.style.position.includes('fixed')) {
+            enterArFullscreen();
+        }
+    }, 500);
 
     // Кнопка "Выйти из AR" в правом верхнем углу
     let exitBtn = document.getElementById('arExitBtn');
