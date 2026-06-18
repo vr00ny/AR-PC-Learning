@@ -332,25 +332,38 @@
     };
 })();
 
-// iOS Safari: playsinline на video + растягиваем canvas на весь экран
+// iOS Safari: playsinline на video + растягиваем canvas на весь экран.
+// AR.js после старта сам задаёт video.style.width/height в пикселях и marginLeft/Top
+// для центрирования под соотношение сторон камеры. Если не сбросить margin/transform
+// и не перезаписывать !important — справа остаётся чёрная полоса.
+function forceFull(el, zIndex) {
+    if (!el) return;
+    const s = el.style;
+    s.setProperty('position', 'absolute', 'important');
+    s.setProperty('top', '0', 'important');
+    s.setProperty('left', '0', 'important');
+    s.setProperty('right', '0', 'important');
+    s.setProperty('bottom', '0', 'important');
+    s.setProperty('width', '100%', 'important');
+    s.setProperty('height', '100%', 'important');
+    s.setProperty('margin', '0', 'important');
+    s.setProperty('padding', '0', 'important');
+    s.setProperty('transform', 'none', 'important');
+    s.setProperty('z-index', String(zIndex), 'important');
+}
+
 function fixArSizes() {
     const v = document.getElementById('arjs-video');
     if (v) {
         v.setAttribute('playsinline', '');
         v.setAttribute('webkit-playsinline', '');
         v.muted = true; v.playsInline = true;
-        v.style.cssText =
-            'position:absolute!important;top:0!important;left:0!important;' +
-            'width:100%!important;height:100%!important;object-fit:cover!important;z-index:1!important;';
+        forceFull(v, 1);
+        v.style.setProperty('object-fit', 'cover', 'important');
         try { v.play && v.play().catch(function () {}); } catch (e) {}
     }
-    // Канвас A-Frame по умолчанию имеет aspect-ratio видео (обычно 4:3),
-    // а экран телефона 9:16 — 3D-сцена занимает только часть экрана.
-    // Принудительно растягиваем canvas на весь iframe.
     document.querySelectorAll('canvas.a-canvas').forEach(function (c) {
-        c.style.cssText =
-            'position:absolute!important;top:0!important;left:0!important;' +
-            'width:100%!important;height:100%!important;z-index:2!important;';
+        forceFull(c, 2);
     });
 }
 
@@ -362,6 +375,10 @@ function nudgeResize() {
     window.dispatchEvent(new Event('resize'));
 }
 window.addEventListener('load', function () {
+    // AR.js дописывает inline-стили видео уже после старта камеры (через 0.5–3 с),
+    // поэтому первые 8 секунд активно перезаписываем размер каждые 250 мс.
+    const sizeFixer = setInterval(fixArSizes, 250);
+    setTimeout(function () { clearInterval(sizeFixer); }, 8000);
     setTimeout(nudgeResize, 300);
     setTimeout(nudgeResize, 1500);
     setTimeout(nudgeResize, 3500);
