@@ -136,6 +136,83 @@
     box-shadow: 0 0 12px rgba(124,217,146,0.25);
 }
 
+/* Информационная плашка под доской — появляется при правильной установке.
+   Объясняет «Где стоит / Зачем / С чем связан» для каждой детали. */
+.assembly-info {
+    margin-top: 14px;
+    padding: 18px 22px;
+    border-radius: 14px;
+    background:
+        radial-gradient(circle at 90% 0%, rgba(79,209,197,0.10), transparent 55%),
+        var(--panel);
+    border: 1px solid rgba(79,209,197,0.35);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+    position: relative;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: max-height .35s ease, opacity .25s ease, transform .25s ease, padding .25s ease;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+}
+.assembly-info.show {
+    max-height: 460px;
+    opacity: 1;
+    transform: translateY(0);
+    padding: 18px 22px;
+    border-width: 1px;
+}
+.assembly-info-title {
+    display: flex; align-items: center; gap: 10px;
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--teal);
+    letter-spacing: -0.01em;
+    margin-bottom: 10px;
+    padding-right: 36px;
+}
+.assembly-info-title .ai-icon { font-size: 22px; }
+.assembly-info-title .ai-tag {
+    margin-left: auto;
+    font: 600 9.5px/1 "JetBrains Mono", monospace;
+    letter-spacing: 0.14em;
+    background: rgba(124,217,146,0.18);
+    color: var(--green);
+    border: 1px solid rgba(124,217,146,0.5);
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+.assembly-info-body p {
+    margin: 0 0 8px;
+    color: var(--ink-dim);
+}
+.assembly-info-body p:last-child { margin-bottom: 0; }
+.assembly-info-body b { color: var(--teal); font-weight: 600; }
+.assembly-info-close {
+    position: absolute;
+    top: 12px; right: 12px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--bg-2);
+    border: 1px solid var(--line-2);
+    color: var(--ink-dim);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, color .15s, border-color .15s;
+}
+.assembly-info-close:hover {
+    background: var(--bg-3);
+    color: var(--ink);
+    border-color: rgba(79,209,197,0.4);
+}
+
 /* Лоток */
 .assembly-tray-title {
     font-family: "JetBrains Mono";

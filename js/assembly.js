@@ -3,10 +3,12 @@
 
 let assemblyState = null;
 let assemblyTimer = null;
+let assemblyInfoTimer = null;
 
 function loadAssemblyGame() {
     renderAssemblyBoard();
     renderAssemblyTray();
+    ensureAssemblyInfoBox();
     resetAssemblyState();
 }
 
@@ -24,12 +26,13 @@ function resetAssemblyState() {
     // Очистка слотов
     document.querySelectorAll('.assembly-slot').forEach(s => {
         const slotData = assemblyData.slots.find(x => x.id === s.dataset.slotId);
-        s.classList.remove('filled', 'highlight');
+        s.classList.remove('filled', 'highlight', 'hint-active');
         s.innerHTML = slotData ? slotData.name : '';
     });
     // Возврат компонентов в лоток
     document.querySelectorAll('.tray-item').forEach(t => t.classList.remove('placed'));
     document.getElementById('assemblyWin').classList.remove('show');
+    hideAssemblyInfo();
     updateStats();
     document.getElementById('statTime').textContent = '0:00';
 }
@@ -46,7 +49,11 @@ function renderAssemblyBoard() {
         div.style.top = slot.y + '%';
         div.style.width = slot.w + '%';
         div.style.height = slot.h + '%';
+        if (slot.z) div.style.zIndex = String(slot.z);
         div.textContent = slot.name;
+        // Подсказка при наведении (без drag) — короткий hint в title-attr.
+        // Полная инфа показывается, когда деталь поставлена.
+        if (slot.hint) div.title = slot.hint;
         board.appendChild(div);
     });
 }
@@ -156,14 +163,27 @@ function attachDragHandlers(item) {
     }
 }
 
+// Ищем слот под курсором. Из-за того, что CPU/RAM/GPU перекрывают материнку
+// (они на ней «лежат»), elementFromPoint вернёт самый верхний слот.
+// Если он не принимает тип перетаскиваемой детали — пробуем нижележащие.
 function findSlotAt(x, y, draggedItem) {
-    // Временно прячем перетаскиваемый элемент, чтобы elementFromPoint его не вернул
-    const prevPointerEvents = draggedItem.style.pointerEvents;
+    const prevPe = draggedItem.style.pointerEvents;
     draggedItem.style.pointerEvents = 'none';
-    const el = document.elementFromPoint(x, y);
-    draggedItem.style.pointerEvents = prevPointerEvents;
-    if (!el) return null;
-    return el.closest('.assembly-slot');
+    const stack = document.elementsFromPoint(x, y);
+    draggedItem.style.pointerEvents = prevPe;
+    const type = draggedItem.dataset.type;
+
+    // Сначала ищем слот, который принимает этот тип
+    for (const el of stack) {
+        const slot = el.closest && el.closest('.assembly-slot');
+        if (slot && slot.dataset.accepts === type) return slot;
+    }
+    // Иначе возвращаем верхний слот — для красной shake-анимации
+    for (const el of stack) {
+        const slot = el.closest && el.closest('.assembly-slot');
+        if (slot) return slot;
+    }
+    return null;
 }
 
 function highlightCompatibleSlots(x, y, type) {
@@ -179,6 +199,7 @@ function clearHighlights() {
 
 function placeItemInSlot(item, slot) {
     const slotId = slot.dataset.slotId;
+    const slotData = assemblyData.slots.find(s => s.id === slotId);
     const component = assemblyData.components[item.dataset.idx];
     item.classList.add('placed');
     slot.classList.add('filled');
@@ -193,9 +214,52 @@ function placeItemInSlot(item, slot) {
     }
     assemblyState.placed[slotId] = item.dataset.idx;
     updateStats();
+
+    // Показываем объяснение «Где / Зачем / С чем связан» для установленной детали
+    if (slotData && slotData.info) {
+        showAssemblyInfo(slotData, component);
+    }
+
     if (Object.keys(assemblyState.placed).length === assemblyData.slots.length) {
         finishAssembly();
     }
+}
+
+// === Информационная плашка под доской ===
+function ensureAssemblyInfoBox() {
+    if (document.getElementById('assemblyInfo')) return;
+    const board = document.getElementById('assemblyBoard');
+    const box = document.createElement('div');
+    box.id = 'assemblyInfo';
+    box.className = 'assembly-info';
+    box.innerHTML =
+        '<button class="assembly-info-close" aria-label="Закрыть" onclick="hideAssemblyInfo()">✕</button>' +
+        '<div class="assembly-info-title" id="assemblyInfoTitle"></div>' +
+        '<div class="assembly-info-body" id="assemblyInfoBody"></div>';
+    board.parentNode.insertBefore(box, board.nextSibling);
+}
+
+function showAssemblyInfo(slotData, component) {
+    const box = document.getElementById('assemblyInfo');
+    const title = document.getElementById('assemblyInfoTitle');
+    const body = document.getElementById('assemblyInfoBody');
+    if (!box || !title || !body) return;
+    const icon = component && component.icon ? component.icon : '🔧';
+    const name = component && component.name ? component.name : slotData.name;
+    title.innerHTML = `<span class="ai-icon">${icon}</span><span>${name}</span><span class="ai-tag">УСТАНОВЛЕНО</span>`;
+    body.innerHTML =
+        `<p><b>Где стоит:</b> ${slotData.info.where}</p>` +
+        `<p><b>Зачем:</b> ${slotData.info.why}</p>` +
+        `<p><b>Связи:</b> ${slotData.info.links}</p>`;
+    box.classList.add('show');
+    if (assemblyInfoTimer) clearTimeout(assemblyInfoTimer);
+    assemblyInfoTimer = setTimeout(hideAssemblyInfo, 12000);
+}
+
+function hideAssemblyInfo() {
+    const box = document.getElementById('assemblyInfo');
+    if (box) box.classList.remove('show');
+    if (assemblyInfoTimer) { clearTimeout(assemblyInfoTimer); assemblyInfoTimer = null; }
 }
 
 function startTimerIfNeeded() {
