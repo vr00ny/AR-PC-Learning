@@ -11,18 +11,33 @@
         html, body { margin: 0; padding: 0; height: 100%; width: 100%; background: #000; overflow: hidden; }
 
         /* A-Frame сцена и её canvas — растянуты на весь iframe, чтобы 3D-объекты
-           рендерились НА видео, а не в правой полосе */
+           рендерились НА видео, а не в правой полосе.
+           ВАЖНО: margin и transform тоже с !important — AR.js после старта
+           дописывает inline marginLeft и width в px для центрирования камеры
+           под её аспект (обычно 4:3 → 1186px при 412px viewport, marginLeft:-387px).
+           Без !important на margin/transform эти inline-стили побеждают наши
+           CSS-правила и появляется чёрная полоса справа. */
         a-scene { display: block; width: 100% !important; height: 100% !important; }
         a-scene .a-canvas, canvas.a-canvas {
             position: absolute !important;
             top: 0 !important; left: 0 !important;
+            right: 0 !important; bottom: 0 !important;
             width: 100% !important; height: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important;
             z-index: 2 !important;
         }
         body > video, body > #arjs-video, video#arjs-video {
             position: absolute !important;
             top: 0 !important; left: 0 !important;
+            right: 0 !important; bottom: 0 !important;
             width: 100% !important; height: 100% !important;
+            min-width: 100% !important; min-height: 100% !important;
+            max-width: none !important; max-height: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            transform: none !important;
             object-fit: cover !important;
             z-index: 1 !important;
         }
